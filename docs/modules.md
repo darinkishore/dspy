@@ -1,34 +1,35 @@
-# dspy.Modules Documentation
+DSPy Modules Documentation
+==========================
 
 This documentation provides an overview of the DSPy Modules.
 
-## DSPy Modules
+DSPy Modules
+------------
 
-| Module | Jump To |
-| --- | --- |
-| Predict | [Predict Section](#dspypredict) |
-| Retrieve | [Retrieve Section](#dspyretrieve) |
-| ChainOfThought | [ChainOfThought Section](#dspychainofthought) |
-| ChainOfThoughtWithHint | [ChainOfThoughtWithHint Section](#dspychainofthoughtwithhint) |
-| MultiChainComparison | [MultiChainComparison Section](#dspymultichaincomparison) |
-| ReAct | [ReAct Section](#dspyreact) |
+- Predict (`Predict Section <#dspypredict>`_)
+- Retrieve (`Retrieve Section <#dspyretrieve>`_)
+- ChainOfThought (`ChainOfThought Section <#dspychainofthought>`_)
+- ChainOfThoughtWithHint (`ChainOfThoughtWithHint Section <#dspychainofthoughtwithhint>`_)
+- MultiChainComparison (`MultiChainComparison Section <#dspymultichaincomparison>`_)
+- ReAct (`ReAct Section <#dspyreact>`_)
 
-## dspy.Predict
+dspy.Predict
+------------
+^^^^^^^^^^^
 
-### Constructor
+The constructor initializes the ``Predict`` class and sets up its attributes, taking in the ``signature`` and additional config options. If the ``signature`` is a string, it processes the input and output fields, generates instructions, and creates a template for the specified ``signature`` type.
 
-The constructor initializes the `Predict` class and sets up its attributes, taking in the `signature` and additional config options. If the `signature` is a string, it processes the input and output fields, generates instructions, and creates a template for the specified `signature` type.
+.. code-block:: python
 
-```python
-class Predict(Parameter):
-    def __init__(self, signature, **config):
-        self.stage = random.randbytes(8).hex()
-        self.signature = signature
-        self.config = config
-        self.reset()
+   class Predict(Parameter):
+       def __init__(self, signature, **config):
+           self.stage = random.randbytes(8).hex()
+           self.signature = signature
+           self.config = config
+           self.reset()
 
-        if isinstance(signature, str):
-            inputs, outputs = signature.split("->")
+           if isinstance(signature, str):
+               inputs, outputs = signature.split("->")
             inputs, outputs = inputs.split(","), outputs.split(",")
             inputs, outputs = [field.strip() for field in inputs], [field.strip() for field in outputs]
 
@@ -43,37 +44,38 @@ class Predict(Parameter):
             outputs = {k: OutputField() for k in outputs}
 
             for k, v in inputs.items():
-                v.finalize(k, infer_prefix(k))
-            
-            for k, v in outputs.items():
-                v.finalize(k, infer_prefix(k))
+               v.finalize(k, infer_prefix(k))
+           
+           for k, v in outputs.items():
+               v.finalize(k, infer_prefix(k))
 
-            self.signature = dsp.Template(instructions, **inputs, **outputs)
-```
+           self.signature = dsp.Template(instructions, **inputs, **outputs)
 
 **Parameters:**
-- `signature` (_Any_): Signature of predictive model.
-- `**config` (_dict_): Additional configuration parameters for model.
+- ``signature`` (_Any_): Signature of predictive model.
+- ``**config`` (_dict_): Additional configuration parameters for model.
 
-### Method
+Method
+^^^^^^
 
-#### `__call__(self, **kwargs)`
+``__call__(self, **kwargs)``
+This method serves as a wrapper for the ``forward`` method. It allows making predictions using the ``Predict`` class by providing keyword arguments.
 
-This method serves as a wrapper for the `forward` method. It allows making predictions using the `Predict` class by providing keyword arguments.
-
-**Paramters:**
-- `**kwargs`: Keyword arguments required for prediction.
+**Parameters:**
+- ``**kwargs``: Keyword arguments required for prediction.
 
 **Returns:**
-- The result of `forward` method.
+- The result of ``forward`` method.
 
-### Examples
+Examples
+^^^^^^^^
 
-```python
-#Define a simple signature for basic question answering
-class BasicQA(dspy.Signature):
-    """Answer questions with short factoid answers."""
-    question = dspy.InputField()
+.. code-block:: python
+
+   # Define a simple signature for basic question answering
+   class BasicQA(dspy.Signature):
+       """Answer questions with short factoid answers."""
+       question = dspy.InputField()
     answer = dspy.OutputField(desc="often between 1 and 5 words")
 
 #Pass signature to Predict module
@@ -88,22 +90,23 @@ print(f"Predicted Answer: {pred.answer}")
 ```
 
 
-## dspy.Retrieve
+dspy.Retrieve
+-------------
 
-### Constructor
+Constructor
+^^^^^^^^^^^
 
-The constructor initializes the `Retrieve` class and sets up its attributes, taking in `k` number of retrieval passages to return for a query.
+The constructor initializes the ``Retrieve`` class and sets up its attributes, taking in ``k`` number of retrieval passages to return for a query.
 
-```python
-class Retrieve(Parameter):
-    def __init__(self, k=3):
-        self.stage = random.randbytes(8).hex()
-        self.k = k
-```
+.. code-block:: python
+
+   class Retrieve(Parameter):
+       def __init__(self, k=3):
+           self.stage = random.randbytes(8).hex()
+           self.k = k
 
 **Parameters:**
-- `k` (_Any_): Number of retrieval responses
-
+- ``k`` (_Any_): Number of retrieval responses
 ### Method
 
 #### `__call__(self, *args, **kwargs):`
