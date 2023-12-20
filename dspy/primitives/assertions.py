@@ -155,7 +155,11 @@ class Suggest(Constraint):
 
 
 def noop_handler(func):
-    """Handler to bypass assertions and suggestions.
+    """Handler used to make assertions and suggestions no-operations (noops).
+
+    Args:
+        func (Callable): The function to be wrapped by this noop handler.
+    """
 
     Now both assertions and suggestions will become noops.
     """
@@ -168,7 +172,13 @@ def noop_handler(func):
 
 
 def bypass_suggest_handler(func):
-    """Handler to bypass suggest only.
+    """Handler used to bypass suggestions only.
+
+    If a suggestion fails, it will be logged but not raised. If an assertion fails, it will be raised.
+
+    Args:
+        func (Callable): The function to be wrapped by this handler to bypass suggestions only.
+    """"""Handler to bypass suggest only.
 
     If a suggestion fails, it will be logged but not raised.
     And If an assertion fails, it will be raised.
@@ -182,7 +192,13 @@ def bypass_suggest_handler(func):
 
 
 def bypass_assert_handler(func):
-    """Handler to bypass assertion only.
+    """Handler used to bypass assertions only.
+
+    If an assertion fails, it will be logged but not raised. If a suggestion fails, it will be raised.
+
+    Args:
+        func (Callable): The function to be wrapped by this handler to bypass assertions only.
+    """"""Handler to bypass assertion only.
 
     If a assertion fails, it will be logged but not raised.
     And If an assertion fails, it will be raised.
@@ -196,7 +212,11 @@ def bypass_assert_handler(func):
 
 
 def assert_no_except_handler(func):
-    """Handler to ignore assertion failure and return None."""
+    """Handler used to ignore assertion failures and return None.
+
+    Args:
+        func (Callable): The function to be wrapped by this handler.
+    """
 
     def wrapper(*args, **kwargs):
         try:
@@ -208,7 +228,15 @@ def assert_no_except_handler(func):
 
 
 def suggest_backtrack_handler(func, bypass_suggest=True, max_backtracks=2):
-    """Handler for backtracking suggestion.
+    """Handler used for backtracking suggestions when a suggestion fails.
+
+    It re-runs the latest predictor up to `max_backtracks` times with an updated signature.
+
+    Args:
+        func (Callable): The function to be wrapped by this handler.
+        bypass_suggest (bool): Flag to bypass suggestions only.
+        max_backtracks (int): The maximum number of times to re-run the predictor.
+    """"""Handler for backtracking suggestion.
 
     Re-run the latest predictor up to `max_backtracks` times,
     with updated signature if a suggestion fails. updated signature adds a new
