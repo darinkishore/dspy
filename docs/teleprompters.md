@@ -1,64 +1,65 @@
-# Teleprompters Documentation
+Teleprompters Documentation
+===========================
 
 Teleprompters are powerful optimizers (included in DSPy) that can learn to bootstrap and select effective prompts for the modules of any program. (The "tele-" in the name means "at a distance", i.e., automatic prompting at a distance.)
 
 This documentation provides an overview of the DSPy Teleprompters.
 
-## Teleprompters
+Teleprompters
+-------------
 
-| Module | Jump To |
-| --- | --- |
-| LabeledFewShot | [LabeledFewShot Section](#telepromptlabeledfewshot) |
-| BootstrapFewShot | [BootstrapFewShot Section](#telepromptbootstrapfewshot) |
-| Ensemble | [Ensemble Section](#telepromptensemble) |
-| BootstrapFewShotWithRandomSearch | [BootstrapFewShotWithRandomSearch Section](#telepromptbootstrapfewshotwithrandomsearch) |
-| BootstrapFinetune | [BootstrapFinetune Section](#telepromptbootstrapfinetune) |
+- `LabeledFewShot <#telepromptlabeledfewshot>`_
+- `BootstrapFewShot <#telepromptbootstrapfewshot>`_
+- `Ensemble <#telepromptensemble>`_
+- `BootstrapFewShotWithRandomSearch <#telepromptbootstrapfewshotwithrandomsearch>`_
+- `BootstrapFinetune <#telepromptbootstrapfinetune>`_
+teleprompt.LabeledFewShot
+-------------------------
 
-## teleprompt.LabeledFewShot
+Constructor
+^^^^^^^^^^^
 
-### Constructor
+The constructor initializes the ``LabeledFewShot`` class and sets up its attributes, particularly defining ``k`` number of samples to be used by the predictor.
 
-The constructor initializes the `LabeledFewShot` class and sets up its attributes, particularly defining `k` number of samples to be used by the predictor.
+.. code-block:: python
 
-```python
-class LabeledFewShot(Teleprompter):
-    def __init__(self, k=16):
-        self.k = k
-```
-
-**Parameters:**
-- `k` (_int_): Number of samples to be used for each predictor. Defaults to 16.
-
-### Method
-
-#### `compile(self, student, *, trainset)`
-
-This method compiles the `LabeledFewShot` instance by configuring the `student` predictor. It assigns subsets of the `trainset` in each student's predictor's `demos` attribute. If the `trainset` is empty, the method returns the original `student`.
+   class LabeledFewShot(Teleprompter):
+       def __init__(self, k=16):
+           self.k = k
 
 **Parameters:**
-- `student` (_Teleprompter_): Student predictor to be compiled.
-- `trainset` (_list_): Training dataset for compiling with student predictor.
+- ``k`` (_int_): Number of samples to be used for each predictor. Defaults to 16.
+Method
+^^^^^^
+
+``compile(self, student, *, trainset)``
+This method compiles the ``LabeledFewShot`` instance by configuring the ``student`` predictor. It assigns subsets of the ``trainset`` in each student's predictor's ``demos`` attribute. If the ``trainset`` is empty, the method returns the original ``student``.
+
+**Parameters:**
+- ``student`` (_Teleprompter_): Student predictor to be compiled.
+- ``trainset`` (_list_): Training dataset for compiling with student predictor.
 
 **Returns:**
-- The compiled `student` predictor with assigned training samples for each predictor or the original `student` if the `trainset` is empty.
+- The compiled ``student`` predictor with assigned training samples for each predictor or the original ``student`` if the ``trainset`` is empty.
 
-### Example
+Example
+^^^^^^^
+.. code-block:: python
 
-```python
-import dspy
+   import dspy
 
-#Assume defined trainset
-class RAG(dspy.Module):
-    def __init__(self, num_passages=3):
-        super().__init__()
+   # Assume defined trainset
+   class RAG(dspy.Module):
+       def __init__(self, num_passages=3):
+           super().__init__()
 
-        #declare retrieval and predictor modules
-        self.retrieve = dspy.Retrieve(k=num_passages)
-        self.generate_answer = dspy.ChainOfThought(GenerateAnswer)
-    
-    #flow for answering questions using predictor and retrieval modules
-    def forward(self, question):
-        context = self.retrieve(question).passages
+           # declare retrieval and predictor modules
+           self.retrieve = dspy.Retrieve(k=num_passages)
+           self.generate_answer = dspy.ChainOfThought(GenerateAnswer)
+       
+       # flow for answering questions using predictor and retrieval modules
+       def forward(self, question):
+           context = self.retrieve(question).passages
         prediction = self.generate_answer(context=context, question=question)
         return dspy.Prediction(context=context, answer=prediction.answer)
 
