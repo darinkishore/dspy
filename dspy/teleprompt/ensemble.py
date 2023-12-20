@@ -18,11 +18,12 @@ class Ensemble(Teleprompter):
         self.size = size
         self.deterministic = deterministic
 
-    def compile(self, programs):
+    async def compile(self, programs):
         size = self.size
         reduce_fn = self.reduce_fn
 
         import dspy
+        import asyncio
         class EnsembledProgram(dspy.Module):
             def __init__(self):
                 super().__init__()
@@ -30,7 +31,10 @@ class Ensemble(Teleprompter):
             
             def forward(self, *args, **kwargs):
                 programs = random.sample(self.programs, size) if size else self.programs
-                outputs = [prog(*args, **kwargs) for prog in programs]
+                async def gather_outputs():
+                    return [await prog(*args, **kwargs) for prog in programs]
+
+                outputs = asyncio.run(gather_outputs())
 
                 if reduce_fn:
                     return reduce_fn(outputs)
