@@ -79,10 +79,7 @@ This function is used to transform a module to handle assertions. It replaces th
             for k, v in inputs.items():
                 v.finalize(k, infer_prefix(k))
             
-            for k, v in outputs.items():
-                v.finalize(k, infer_prefix(k))
 
-            self.signature = dsp.Template(instructions, **inputs, **outputs)
             
             for k, v in outputs.items():
                 v.finalize(k, infer_prefix(k))
