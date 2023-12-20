@@ -40,29 +40,103 @@ The assertion handlers are used to control the behavior of assertions and sugges
 
 This handler is used to bypass assertions and suggestions. When used, both assertions and suggestions will become no-operations (noops).
 
+:param func: The function to be handled.
+:return: None. The function becomes a no-operation.
+
+Example:
+```python
+def my_func():
+    # some code here
+noop_handler(my_func)
+```
+
 #### `bypass_suggest_handler(func)`
 
 This handler is used to bypass suggestions only. If a suggestion fails, it will be logged but not raised. If an assertion fails, it will be raised.
 
+:param func: The function to be handled.
+:return: None. Suggestions become no-operations, while assertions are handled normally.
+
+Example:
+```python
+def my_func():
+    # some code here
+bypass_suggest_handler(my_func)
+```
 #### `bypass_assert_handler(func)`
 
 This handler is used to bypass assertions only. If an assertion fails, it will be logged but not raised. If a suggestion fails, it will be raised.
+
+:param func: The function to be handled.
+:return: None. Assertions become no-operations, while suggestions are handled normally.
+
+Example:
+```python
+def my_func():
+    # some code here
+bypass_assert_handler(my_func)
+```
 
 #### `assert_no_except_handler(func)`
 
 This handler is used to ignore assertion failures and return None.
 
+:param func: The function to be handled.
+:return: None. Assertion failures are ignored and the function returns None.
+
+Example:
+```python
+def my_func():
+    # some code here
+assert_no_except_handler(my_func)
+```
+
 #### `suggest_backtrack_handler(func, bypass_suggest=True, max_backtracks=2)`
 
 This handler is used for backtracking suggestions. It re-runs the latest predictor up to `max_backtracks` times, with updated signature if a suggestion fails.
+
+:param func: The function to be handled.
+:param bypass_suggest: Boolean indicating whether to bypass suggestions. Defaults to True.
+:param max_backtracks: Maximum number of times to re-run the predictor if a suggestion fails. Defaults to 2.
+:return: None. The function is re-run up to `max_backtracks` times if a suggestion fails.
+
+Example:
+```python
+def my_func():
+    # some code here
+suggest_backtrack_handler(my_func, bypass_suggest=True, max_backtracks=2)
+```
 
 #### `handle_assert_forward(assertion_handler, **handler_args)`
 
 This function is used to handle assertions. It wraps the `forward` method of a module with an assertion handler.
 
+:param assertion_handler: The assertion handler to use.
+:param **handler_args: Additional arguments for the assertion handler.
+:return: None. The `forward` method of the module is wrapped with the assertion handler.
+
+Example:
+```python
+def my_assertion_handler():
+    # some code here
+handle_assert_forward(my_assertion_handler, **handler_args)
+```
+
 #### `assert_transform_module(module, assertion_handler=default_assertion_handler, **handler_args)`
 
 This function is used to transform a module to handle assertions. It replaces the `forward` method of the module with a version that handles assertions.
+
+:param module: The module to be transformed.
+:param assertion_handler: The assertion handler to use. Defaults to `default_assertion_handler`.
+:param **handler_args: Additional arguments for the assertion handler.
+:return: None. The `forward` method of the module is replaced with a version that handles assertions.
+
+Example:
+```python
+def my_module():
+    # some code here
+assert_transform_module(my_module, assertion_handler=my_assertion_handler, **handler_args)
+```
             inputs, outputs = inputs.split(","), outputs.split(",")
             inputs, outputs = [field.strip() for field in inputs], [field.strip() for field in outputs]
 
@@ -93,7 +167,6 @@ This function is used to transform a module to handle assertions. It replaces th
 **Parameters:**
 - `signature` (_Any_): Signature of predictive model.
 - `**config` (_dict_): Additional configuration parameters for model.
-
 ### Method
 
 #### `__call__(self, **kwargs)`
