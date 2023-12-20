@@ -58,7 +58,7 @@ class BootstrapFinetune(Teleprompter):
                                              teacher_settings=teacher_settings)
         
 
-    def compile(self, student, *, teacher=None, trainset, valset=None,
+    async def compile(self, student, *, teacher=None, trainset, valset=None,
                 target='t5-large', bsize=12, accumsteps=1, lr=5e-5, epochs=1, bf16=False, int8=False, peft=False, path_prefix=None):
 
         # It's usually better to supply a few-shot teacher, rather than uncompiled module (the student).
@@ -72,7 +72,7 @@ class BootstrapFinetune(Teleprompter):
 
         for teacher in teachers:
             # Dummy compilation to get bootstraps.
-            compiled = self.teleprompter.compile(student, teacher=teacher, trainset=trainset)
+            compiled = await self.teleprompter.compile(student, teacher=teacher, trainset=trainset)
             multitask = self.multitask
 
             # Prepare finetune <prompt, completion> pairs.
@@ -141,7 +141,7 @@ class BootstrapFinetune(Teleprompter):
             training_data_path = finetune_paths[name]
             compiler_config_ = dict(compiler_config)
             compiler_config_['save'] = compiler_config['save'] + '.' + name
-            best_ckpt_path = finetune_hf(training_data_path, target, compiler_config_)
+            best_ckpt_path = await finetune_hf(training_data_path, target, compiler_config_)
 
             print(f"#> Best checkpoint path: {best_ckpt_path} for {name}")
             finetune_models[name] = dsp.HFModel(model=target, checkpoint=best_ckpt_path) # best_ckpt_path
