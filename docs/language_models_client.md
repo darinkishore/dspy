@@ -1,16 +1,22 @@
-# LM Modules Documentation
+# Language Model Modules Documentation
 
-This documentation provides an overview of the DSPy Language Model Clients.
+This documentation provides a comprehensive overview of the Language Model (LM) Clients in the DSPy framework.
 
 ### Quickstart
 
 ```python
 import dspy
 
+# Initialize the OpenAI client with the desired model
 lm = dspy.OpenAI(model='gpt-3.5-turbo')
 
+# Define the prompt
 prompt = "Translate the following English text to Spanish: 'Hi, how are you?'"
+
+# Generate completions
 completions = lm(prompt, n=5, return_sorted=False)
+
+# Print the generated completions
 for i, completion in enumerate(completions):
     print(f"Completion {i+1}: {completion}")
 ```
@@ -29,6 +35,7 @@ for i, completion in enumerate(completions):
 ### Usage
 
 ```python
+# Initialize the OpenAI client with the desired model
 lm = dspy.OpenAI(model='gpt-3.5-turbo')
 ```
 
@@ -60,20 +67,20 @@ class OpenAI(LM):
 
 #### `__call__(self, prompt: str, only_completed: bool = True, return_sorted: bool = False, **kwargs) -> List[Dict[str, Any]]`
 
-Retrieves completions from OpenAI by calling `request`. 
+This method retrieves completions from OpenAI by calling the `request` method. 
 
-Internally, the method handles the specifics of preparing the request prompt and corresponding payload to obtain the response.
+Internally, it prepares the request prompt and the corresponding payload to obtain the response from the OpenAI API.
 
-After generation, the completions are post-processed based on the `model_type` parameter. If the parameter is set to 'chat', the generated content look like `choice["message"]["content"]`. Otherwise, the generated text will be `choice["text"]`.
+After the generation process, the completions are post-processed based on the `model_type` parameter. If the `model_type` is set to 'chat', the generated content will be in the format `choice["message"]["content"]`. If the `model_type` is set to 'text', the generated content will be in the format `choice["text"]`.
 
 **Parameters:**
-- `prompt` (_str_): Prompt to send to OpenAI.
-- `only_completed` (_bool_, _optional_): Flag to return only completed responses and ignore completion due to length. Defaults to True.
-- `return_sorted` (_bool_, _optional_): Flag to sort the completion choices using the returned averaged log-probabilities. Defaults to False.
-- `**kwargs`: Additional keyword arguments for completion request.
+- `prompt` (_str_): The prompt to send to the OpenAI API.
+- `only_completed` (_bool_, _optional_): A flag to return only completed responses and ignore completions that were cut off due to length. Defaults to True.
+- `return_sorted` (_bool_, _optional_): A flag to sort the completion choices based on the returned averaged log-probabilities. Defaults to False.
+- `**kwargs`: Additional keyword arguments for the completion request.
 
 **Returns:**
-- `List[Dict[str, Any]]`: List of completion choices.
+- `List[Dict[str, Any]]`: A list of completion choices.
 
 ## Cohere
 
@@ -91,7 +98,7 @@ The constructor initializes the base class `LM` and verifies the `api_key` to se
 class Cohere(LM):
     def __init__(
         self,
-        model: str = "command-xlarge-nightly",
+        model: str = "baseline-16",
         api_key: Optional[str] = None,
         stop_sequences: List[str] = [],
     ):
@@ -103,7 +110,6 @@ class Cohere(LM):
 - `stop_sequences` (_List[str]_, _optional_): List of stopping tokens to end generation.
 
 ### Methods
-
 Refer to [`dspy.OpenAI`](#openai) documentation.
 
 ## TGI
@@ -124,7 +130,7 @@ The constructor initializes the `HFModel` base class and configures the client f
 
 ```python
 class HFClientTGI(HFModel):
-    def __init__(self, model, port, url="http://future-hgx-1", **kwargs):
+    def __init__(self, model, port, url="http://localhost", **kwargs):
 ```
 
 **Parameters:**
@@ -151,7 +157,7 @@ Refer to the [vLLM Server](https://github.com/stanfordnlp/dspy/blob/local_models
 
 ### Constructor
 
-Refer to [`dspy.TGI`](#tgi) documentation. Replace with `HFClientVLLM`.
+Refer to [`dspy.TGI`](#tgi) documentation for the constructor. Replace `HFClientTGI` with `HFClientVLLM`.
 
 ### Methods
 
