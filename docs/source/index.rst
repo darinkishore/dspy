@@ -3,7 +3,7 @@
 DSPy
 ==================
 
-.. image:: docs/images/DSPy8.png
+.. image:: /docs/images/DSPy8.png
    :align: center
    :width: 460px
 
@@ -17,3 +17,10 @@ DSPy: *Programming*—not prompting—Foundation Models
 To make this possible:
 
 - **DSPy** provides **composable and declarative modules** for instruct
+
+.. toctree::
+   :maxdepth: 2
+
+   document1
+   document2
+   document3
