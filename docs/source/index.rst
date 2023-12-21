@@ -17,3 +17,8 @@ DSPy: *Programming*—not prompting—Foundation Models
 To make this possible:
 
 - **DSPy** provides **composable and declarative modules** for instruct
+
+.. toctree::
+   :maxdepth: 2
+
+   using_local_models
