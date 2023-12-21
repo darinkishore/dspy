@@ -1,5 +1,5 @@
-LM Modules Documentation
-========================
+Language Model Modules Documentation
+======================================
 
 This documentation provides an overview of the DSPy Language Model
 Clients.
@@ -13,8 +13,12 @@ Quickstart
 
    lm = dspy.OpenAI(model='gpt-3.5-turbo')
 
+   # Define the prompt
    prompt = "Translate the following English text to Spanish: 'Hi, how are you?'"
+   # Generate completions
+   # Request a list of completions
    completions = lm(prompt, n=5, return_sorted=False)
+   # Print the generated completions
    for i, completion in enumerate(completions):
        print(f"Completion {i+1}: {completion}")
 
@@ -53,6 +57,7 @@ generation parameters needed for communicating with the GPT API, such as
 
 .. code:: python
 
+   # OpenAI client class definition
    class OpenAI(LM):
        def __init__(
            self,
@@ -76,25 +81,25 @@ Methods
 ``__call__(self, prompt: str, only_completed: bool = True, return_sorted: bool = False, **kwargs) -> List[Dict[str, Any]]``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Retrieves completions from OpenAI by calling ``request``.
+This method retrieves completions from OpenAI by calling the ``request`` method.
 
 Internally, the method handles the specifics of preparing the request
 prompt and corresponding payload to obtain the response.
 
-After generation, the completions are post-processed based on the
+After the generation process, the completions are post-processed based on the
 ``model_type`` parameter. If the parameter is set to ‘chat’, the
 generated content look like ``choice["message"]["content"]``. Otherwise,
 the generated text will be ``choice["text"]``.
 
-**Parameters:** - ``prompt`` (*str*): Prompt to send to OpenAI. -
-``only_completed`` (*bool*, *optional*): Flag to return only completed
+**Parameters:** - ``prompt`` (*str*): The prompt text to be submitted to the OpenAI server. -
+``only_completed`` (*bool*, *optional*): A flag to return only completed
 responses and ignore completion due to length. Defaults to True. -
 ``return_sorted`` (*bool*, *optional*): Flag to sort the completion
 choices using the returned averaged log-probabilities. Defaults to
 False. - ``**kwargs``: Additional keyword arguments for completion
 request.
 
-**Returns:** - ``List[Dict[str, Any]]``: List of completion choices.
+**Return Value:** - ``List[Dict[str, Any]]``: A list of completion choices.
 
 Cohere
 ------
@@ -106,7 +111,7 @@ Usage
 
 .. code:: python
 
-   lm = dsp.Cohere(model='command-xlarge-nightly')
+   lm = dspy.Cohere(model='baseline-16')   # Usage updated with the new default model
 
 .. _constructor-1:
 
