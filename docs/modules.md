@@ -157,11 +157,6 @@ assert_transform_module(my_module, assertion_handler=my_assertion_handler, **han
                 v.finalize(k, infer_prefix(k))
 
             self.signature = dsp.Template(instructions, **inputs, **outputs)
-            
-            for k, v in outputs.items():
-                v.finalize(k, infer_prefix(k))
-
-            self.signature = dsp.Template(instructions, **inputs, **outputs)
 ```
 
 **Parameters:**
