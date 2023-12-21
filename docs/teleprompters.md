@@ -31,9 +31,9 @@ class LabeledFewShot(Teleprompter):
 
 ### Method
 
-#### `compile(self, student, *, trainset)`
+#### `async compile(self, student, *, trainset)`
 
-This method compiles the `LabeledFewShot` instance by configuring the `student` predictor. It assigns subsets of the `trainset` in each student's predictor's `demos` attribute. If the `trainset` is empty, the method returns the original `student`.
+This method asynchronously compiles the `LabeledFewShot` instance by configuring the `student` predictor. It assigns subsets of the `trainset` in each student's predictor's `demos` attribute. If the `trainset` is empty, the method returns the original `student`.
 
 **Parameters:**
 - `student` (_Teleprompter_): Student predictor to be compiled.
@@ -46,6 +46,7 @@ This method compiles the `LabeledFewShot` instance by configuring the `student` 
 
 ```python
 import dspy
+import asyncio
 
 #Assume defined trainset
 class RAG(dspy.Module):
@@ -64,6 +65,10 @@ class RAG(dspy.Module):
 
 #Define teleprompter
 teleprompter = LabeledFewShot()
+
+# Compile!
+compiled_rag = asyncio.run(teleprompter.compile(student=RAG(), trainset=trainset))
+```
 
 # Compile!
 compiled_rag = teleprompter.compile(student=RAG(), trainset=trainset)

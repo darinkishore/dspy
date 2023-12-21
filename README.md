@@ -1,5 +1,3 @@
-current docs link: https://dspy-ai.readthedocs.io/en/latest/
-
 <p align="center">
   <img align="center" src="docs/images/DSPy8.png" width="460px" />
 </p>
