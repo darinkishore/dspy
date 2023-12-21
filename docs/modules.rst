@@ -56,7 +56,7 @@ fields, generates instructions, and creates a template for the specified
 
            if isinstance(signature, str):
                inputs, outputs = signature.split("->")
-   ## dspy.Assertion Helpers
+   
 
    ### Assertion Handlers
 
@@ -119,6 +119,16 @@ fields, generates instructions, and creates a template for the specified
 - ``**config`` (*dict*): Additional configuration parameters for model.
 
 Method
+~~~~~~
+
+``__call__(self, model_predict):``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This method serves as a wrapper for the predictive model, allowing users to make predictions by passing keyword arguments that match the signature of the prediction model.
+
+**Parameters:** - ``**kwargs``: Keyword arguments that match the signature required for prediction.
+
+**Returns:** - The result of the predictive model, usually a dictionary containing output fields.
 ~~~~~~
 
 ``__call__(self, **kwargs)``
