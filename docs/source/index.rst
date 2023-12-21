@@ -1,11 +1,6 @@
 ===========
 
-.. image:: docs/images/DSPy8.png
-   :align: center
-   :width: 460px
 
-DSPy: *Programming*—not prompting—Foundation Models
-----------------------------------------------------
 
 (links to paper and iamges from readme)
 
@@ -13,8 +8,9 @@ DSPy: *Programming*—not prompting—Foundation Models
 =======
 .. _index:
 
-DSPy
-==================
+.. include:: readme.rst
+
+.. toctree::
 
 .. image:: docs/images/DSPy8.png
    :align: center
@@ -31,8 +27,8 @@ DSPy: *Programming*—not prompting—Foundation Models
    :maxdepth: 2
    :caption: Table of Contents
 
-   language_models_client
-   retrieval_models_client
+   language_models
+   retrieval_models
    using_local_models
    modules
    teleprompters
@@ -48,7 +44,7 @@ DSPy: *Programming*—not prompting—Foundation Models
 (links to paper and iamges from readme)
 
 **DSPy** is the framework for solving advanced tasks with language models (LMs) and retrieval models (RMs). **DSPy** unifies techniques for **prompting** and **fine-tuning** LMs — and approaches for **reasoning**, **self-improvement**, and **augmentation with retrieval and tools**. All of these are expressed through modules that compose and learn.
-Language Model Clients
+.. include:: language_models.rst
 ----------------------
 
 Language Model Clients are interfaces for interacting with various language models. They provide a unified API for different language models, allowing you to switch between different models with minimal code changes.
@@ -58,7 +54,7 @@ For more details, see :doc:`language_models_client`.
 Retrieval Model Clients
 -----------------------
 
-Retrieval Model Clients are interfaces for interacting with various retrieval models. They provide a unified API for different retrieval models, allowing you to switch between different models with minimal code changes.
+.. include:: retrieval_models.rst are interfaces for interacting with various retrieval models. They provide a unified API for different retrieval models, allowing you to switch between different models with minimal code changes.
 
 For more details, see :doc:`retrieval_models_client`.
 
@@ -76,7 +72,7 @@ Modules in DSPy are composable and declarative components that encapsulate speci
 
 For more details, see :doc:`modules`.
 
-Teleprompters
+.. include:: teleprompters.rst
 -------------
 
 Teleprompters in DSPy are powerful optimizers that can learn to bootstrap and select effective prompts for the modules of any program.
