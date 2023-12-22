@@ -1,6 +1,7 @@
 import dsp
 import tqdm
 import random
+from dspy.fields import InputField, OutputField
 
 from dspy.teleprompt.teleprompt import Teleprompter
 
@@ -28,7 +29,28 @@ from dspy.evaluate.evaluate import Evaluate
 
 
 class BootstrapFewShotWithRandomSearch(Teleprompter):
-    def __init__(self, metric, teacher_settings={}, max_bootstrapped_demos=4, max_labeled_demos=16, max_rounds=1, num_candidate_programs=16, num_threads=6, stop_at_score=None):
+
+    def process_signature(self, signature):
+        inputs, outputs = signature.split('->')
+        inputs, outputs = inputs.split(','), outputs.split(',')
+        inputs, outputs = [field.strip() for field in inputs], [field.strip() for field in outputs]
+        return inputs, outputs
+
+    def generate_instructions(self, inputs, outputs):
+        inputs_ = ', '.join([f'`{field}`' for field in inputs])
+        outputs_ = ', '.join([f'`{field}`' for field in outputs])
+        instructions = f'Given the fields {inputs_}, produce the fields {outputs_}.'
+        return instructions
+
+    def create_template(self, inputs, outputs, instructions):
+        inputs = {k: InputField() for k in inputs}
+        outputs = {k: OutputField() for k in outputs}
+        template = {'inputs': inputs, 'outputs': outputs, 'instructions': instructions}
+        return template
+    def __init__(self, signature, metric, teacher_settings={}, max_bootstrapped_demos=4, max_labeled_demos=16, max_rounds=1, num_candidate_programs=16, num_threads=6, stop_at_score=None):
+        inputs, outputs = self.process_signature(signature)
+        instructions = self.generate_instructions(inputs, outputs)
+        template = self.create_template(inputs, outputs, instructions)
         self.metric = metric
         self.teacher_settings = teacher_settings
         self.max_rounds = max_rounds
