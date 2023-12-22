@@ -1,5 +1,9 @@
 # Documentation Guide
 
+## Teleprompt Documentation
+
+Refer to the `language_models/language_models_client.md` and `language_models/using_local_models.md` for comprehensive documentation related to the `teleprompt` feature.
+
 ## A guide for docs contributors
 
 The `docs` directory contains the sphinx source text for DSPy docs, visit
