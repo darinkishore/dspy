@@ -1,4 +1,38 @@
-# Using local models within DSPy
+# Teleprompt
+
+## Purpose and Philosophy
+
+Teleprompt aims to streamline and enrich the interaction between users and language models by providing a structured way to craft prompts that convey user intent more effectively. The philosophical underpinning of Teleprompt is that high-quality, intentional communication can significantly improve the performance of language models. By enabling users to create clear, contextual, and precise prompts, Teleprompt strives to harness the full potential of language models in understanding and generating language that aligns with human thought and inquiry.
+
+## How It Achieves Its Purpose
+
+Teleprompt leverages a combination of linguistic guidelines and algorithmic adjustments to achieve its purpose. It provides users with the ability to specify various aspects of the prompt, such as tone, formality, and complexity, according to the context and desired outcome. It allows for customization of the prompts to guide language models more closely to the user's expectations, ensuring that the generated text is more insightful and contextually relevant.
+
+## Usage Examples
+
+To illustrate the versatility and implementation of Teleprompt, the following examples showcase how to configure and use it:
+
+```python
+# Creating a Teleprompt Configuration
+prompt_config = dspy.TelepromptConfig(
+    tone='question',
+    style='casual',
+    formality=False,
+    complexity='moderate'
+)
+
+# Crafting the prompt using the configuration
+prompt = dspy.create_teleprompt(
+    input_text="What are the effects of climate change on marine biodiversity?",
+    config=prompt_config
+)
+
+# Obtaining the language model's response
+response = language_model(prompt)
+print(response)
+```
+
+These examples demonstrate the application of Teleprompt in clarifying intent and guiding language models towards generating relevant, accurate, and contextually appropriate responses.# Using local models within DSPy
 
 DSPy supports various methods including `built-in wrappers`, `server integration`, and `external package integration` for model loading. This documentation provides a concise introduction on how to load in models within DSPy extending these capabilities for your specific needs.
 
