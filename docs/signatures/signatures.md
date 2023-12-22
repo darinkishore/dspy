@@ -1,4 +1,6 @@
-# DSPy Signatures Documentation
+============
+DSPy Signatures Documentation
+============
 
 This documentation provides an overview of the DSPy Signatures.
 
@@ -68,13 +70,19 @@ This method calls the `Signature` class.
 
 ### `__getattr__(cls, attr)`
 
+## Using Signatures
+
+Here is an example of how to use signatures in DSPy:
+
+.. code-block:: python
+
 This method is used to get the attribute `attr` of the `Signature` class.
 
 ## Using Signatures
 
 Here is an example of how to use signatures in DSPy:
 
-```python
+.. code-block:: python
 # Define a signature for a task
 class MyTask(dspy.Signature):
     """This is a task."""
@@ -83,6 +91,6 @@ class MyTask(dspy.Signature):
 
 # Use the signature in a module
 my_module = dspy.Predict(MyTask)
-```
+..
 
 In this example, we define a signature for a task called `MyTask`. We then use this signature in a `Predict` module.
