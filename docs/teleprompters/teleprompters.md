@@ -18,7 +18,7 @@ This documentation provides an overview of the DSPy Teleprompters.
 
 ### Constructor
 
-The constructor initializes the `LabeledFewShot` class and sets up its attributes, particularly defining `k` number of samples to be used by the predictor.
+The constructor initializes the `LabeledFewShot` class with the specified number of demos `k` to be used for each predictor. If `sample` is `True`, this number of demos will be chosen randomly from the `trainset`. Otherwise, the first `k` demos from the `trainset` will be selected. to be used by the predictor.
 
 ```python
 class LabeledFewShot(Teleprompter):
@@ -33,11 +33,12 @@ class LabeledFewShot(Teleprompter):
 
 #### `compile(self, student, *, trainset)`
 
-This method compiles the `LabeledFewShot` instance by configuring the `student` predictor. It assigns subsets of the `trainset` in each student's predictor's `demos` attribute. If the `trainset` is empty, the method returns the original `student`.
+This method compiles the `LabeledFewShot` instance by preparing the `student` module with demo samples from the `trainset` for each of the student's predictors. It decides whether to sample randomly from the training demoes or to take the first `k` demoes based on the `sample` parameter. `k` denotes the limit on the number of demoes to use, which was set during the construction of the `LabeledFewShot` instance. It assigns subsets of the `trainset` in each student's predictor's `demos` attribute. If the `trainset` is empty, the method returns the original `student`.
 
 **Parameters:**
 - `student` (_Teleprompter_): Student predictor to be compiled.
-- `trainset` (_list_): Training dataset for compiling with student predictor.
+- `trainset` (_list_): A list of example objects to be used as training demos.
+- `sample` (_bool_, optional): Determines if the demos should be randomly sampled from the `trainset`. Defaults to `True`.
 
 **Returns:**
 - The compiled `student` predictor with assigned training samples for each predictor or the original `student` if the `trainset` is empty.
@@ -121,9 +122,9 @@ The final stage is performing the bootstrapping iterations.
 #Assume defined RAG class
 ...
 
-#Define teleprompter and include teacher
+
 teacher = dspy.OpenAI(model='gpt-3.5-turbo', api_key = openai.api_key, api_provider = "openai", model_type = "chat")
-teleprompter = BootstrapFewShot(teacher_settings=dict({'lm': teacher}))
+
 
 # Compile!
 compiled_rag = teleprompter.compile(student=RAG(), trainset=trainset)
@@ -141,8 +142,8 @@ class Ensemble(Teleprompter):
 ```
 
 **Parameters:**
-- `reduce_fn` (_callable_, _optional_): Function used to reduce multiple outputs from different programs into a single output. A common choice is `dspy.majority`. Defaults to `None`.
-- `size` (_int_, _optional_): Number of programs to randomly select for ensembling. If not specified, all programs will be used. Defaults to `None`.
+- `reduce_fn` (_callable_, _optional_): Function used to reduce multiple outputs from different programs into a single output. A common choice is `dspy.majority`. If set to `None`, all sampled outputs will be returned as a list. Defaults to `None`.
+- `size` (_int_, _optional_): Number of programs to randomly select for ensembling if not all programs are to be used for reduction. If not specified, all programs will be used. Defaults to `None`.
 - `deterministic` (_bool_, _optional_): Specifies whether ensemble should operate deterministically. Currently, setting this to `True` will raise an error as this feature is pending implementation. Defaults to `False`.
 
 ### Method
@@ -180,7 +181,7 @@ ensembled_program = teleprompter.compile(programs)
 The constructor initializes the `BootstrapFewShotWithRandomSearch` class and sets up its attributes. It inherits from the `BootstrapFewShot` class and introduces additional attributes for the random search process.
 
 ```python
-class BootstrapFewShotWithRandomSearch(BootstrapFewShot):
+class BootstrapFewShotWithRandomSearch(LabeledFewShot):
     def __init__(self, metric, teacher_settings={}, max_bootstrapped_demos=4, max_labeled_demos=16, max_rounds=1, num_candidate_programs=16, num_threads=6):
         self.metric = metric
         self.teacher_settings = teacher_settings
@@ -272,7 +273,7 @@ This method first compiles for bootstrapping with the `BootstrapFewShot` telepro
 
 ```python
 #Assume defined trainset
-#Assume defined RAG class
+# Assume the RAG class is already defined as shown earlier
 ...
 
 #Define teleprompter
