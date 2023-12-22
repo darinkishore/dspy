@@ -133,7 +133,14 @@ compiled_rag = teleprompter.compile(student=RAG(), trainset=trainset)
 
 ### Constructor
 
-The constructor initializes the `Ensemble` class and sets up its attributes. This teleprompter is designed to create ensembled versions of multiple programs, reducing various outputs from different programs into a single output.
+### `__init__(self, *, reduce_fn=None, size=None, deterministic=False)`
+
+The `Ensemble` constructor initializes an `Ensemble` teleprompter instance. It is designed to create ensembled versions of multiple programs. This means the final program uses multiple component programs' outputs to form a singular output, often leading to robust predictions.
+
+**Parameters:**
+- `reduce_fn` (_callable_, _optional_): Function that reduces outputs from different programs. A common reduce function is `dspy.majority`. Defaults to `None`.
+- `size` (_int_, _optional_): The subset size of programs to use when not using all for the ensemble. Defaults to `None`, which means all programs are used.
+- `deterministic` (_bool_, _optional_): Currently not implemented; if set to `True`, raises a `NotImplementedError`. It is intended for deterministic sampling of programs for the ensemble. Defaults to `False`.
 
 ```python
 class Ensemble(Teleprompter):
@@ -149,7 +156,15 @@ class Ensemble(Teleprompter):
 
 #### `compile(self, programs)`
 
-This method compiles an ensemble of programs into a single program that when run, can either randomly sample a subset of the given programs to produce outputs or use all of them. The multiple outputs can then be reduced into a single output using the `reduce_fn`.
+#### `compile(self, programs)`
+
+Compile an ensemble of programs into a single `EnsembledProgram` which, when executed, can sample a subset of the programs or use all of them to produce outputs. These outputs are then combined using a specified `reduce_fn`.
+
+**Parameters:**
+- `programs` (_list_): List of `dspy.Module` instances to be ensembled.
+
+**Returns:**
+- An instance of `EnsembledProgram`, which can be used just like any other `dspy.Module`. The ensembled program runs the forward method on the individual programs selected, collects their outputs, and uses the `reduce_fn` to produce a final output. If `reduce_fn` is None, it returns the list of outputs directly.
 
 **Parameters:**
 - `programs` (_list_): List of programs to be ensembled.
@@ -235,7 +250,19 @@ compiled_rag = teleprompter.compile(student=RAG(), trainset=trainset)
 
 ### `__init__(self, metric=None, teacher_settings={}, multitask=True)`
 
-The constructor initializes a `BootstrapFinetune` instance and sets up its attributes. It defines the teleprompter as a `BootstrapFewShot` instance for the finetuning compilation.
+### `__init__(self, metric=None, teacher_settings={}, multitask=True)`
+
+The `BootstrapFinetune` constructor initializes an instance of `BootstrapFinetune`. It adapts the `BootstrapFewShot` teleprompter concept specifically for a fine-tuning compilation process.
+
+```python
+class BootstrapFinetune(Teleprompter):
+    def __init__(self, metric=None, teacher_settings={}, multitask=True):
+```
+
+**Parameters:**
+- `metric` (_callable_, _optional_): A function used to compute the match between a model's predictions and the gold answers. It informs the bootstrapping process during fine-tuning. Defaults to `None`.
+- `teacher_settings` (_dict_, _optional_): Configuration for the teacher model used in fine-tuning. Defaults to an empty dictionary.
+- `multitask` (_bool_, _optional_): When `True`, fine-tuning treats tasks as related and attempts to learn across tasks. Defaults to `True`.
 
 ```python
 class BootstrapFinetune(Teleprompter):
@@ -247,11 +274,37 @@ class BootstrapFinetune(Teleprompter):
 - `teacher_settings` (_dict_, _optional_): Settings for teacher predictor. Defaults to empty dictionary.
 - `multitask` (_bool_, _optional_): Enable multitask fine-tuning. Defaults to `True`.
 
-### Method
+#### `compile(self, student, *, teacher=None, trainset, valset=None, target='t5-large', bsize=12, accumsteps=1, lr=5e-5, epochs=1, bf16=False, int8=False, peft=False, path_prefix=None)`
 
-#### `compile(self, student, *, teacher=None, trainset, valset=None, target='t5-large', bsize=12, accumsteps=1, lr=5e-5, epochs=1, bf16=False)`
+This method is responsible for compiling a `BootstrapFinetune` instance. It heavily involves preparing the finetuning dataset, performing the finetune, and putting together the compiled package with new fine-tuned language models.
 
-This method first compiles for bootstrapping with the `BootstrapFewShot` teleprompter. It then prepares fine-tuning data by generating prompt-completion pairs for training and performs finetuning. After compilation, the LMs are set to the finetuned models and the method returns a compiled and fine-tuned predictor.
+**Parameters:**
+- `student` (_dspy.Module_): The student model to be fine-tuned.
+- `teacher` (_dspy.Module_ or _list_ of _dspy.Module_, _optional_): The teacher model(s) used to guide fine-tuning. Defaults to `None`.
+- `trainset` (_iterable_): A collection of examples used for training.
+- `valset` (_iterable_, _optional_): A collection of examples used for validation. Defaults to `None`.
+- `target` (_str_, _optional_): The identifier for the Hugging Face model to be fine-tuned. Defaults to `'t5-large'`.
+- `bsize` (_int_, _optional_): The batch size used during fine-tuning. Defaults to `12`.
+- `accumsteps` (_int_, _optional_): The number of gradient accumulation steps. Defaults to `1`.
+- `lr` (_float_, _optional_): The learning rate. Defaults to `5e-5`.
+- `epochs` (_int_, _optional_): The number of epochs to train for. Defaults to `1`.
+- `bf16` (_bool_, _optional_): Whether to use Brain Floating Point 16-bit precision. Defaults to `False`.
+- `int8` (_bool_, _optional_): Whether to use 8-bit integer precision. Defaults to `False`.
+- `peft` (_bool_, _optional_): Whether to use Pre-trained Encoder Fine-Tuning (PEFT). Defaults to `False`.
+- `path_prefix` (_str_, _optional_): Path prefix for saving training artifacts. Defaults to `None`.
+
+**Returns:**
+- A newly compiled instance of `dspy.Module` incorporating the fine-tuned language model(s).
+
+**Example Usage:**
+
+```python
+# Assume defined `trainset`
+# Assume defined `student_model` instance of `dspy.Module`
+
+bootstrap_finetuner = BootstrapFinetune()
+compiled_model = bootstrap_finetuner.compile(student_model, trainset=trainset)
+```
 
 **Parameters:**
 - `student` (_Predict_): Student predictor to be fine-tuned.
