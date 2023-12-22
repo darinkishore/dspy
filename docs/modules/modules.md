@@ -6,17 +6,17 @@ This documentation provides an overview of the DSPy Modules.
 
 | Module | Jump To |
 | --- | --- |
-| Predict | [Predict Section](#dspypredict) |
-| Retrieve | [Retrieve Section](#dspyretrieve) |
-| ChainOfThought | [ChainOfThought Section](#dspychainofthought) |
-| ChainOfThoughtWithHint | [ChainOfThoughtWithHint Section](#dspychainofthoughtwithhint) |
-| MultiChainComparison | [MultiChainComparison Section](#dspymultichaincomparison) |
-| ReAct | [ReAct Section](#dspyreact) |
-| Assertion Helpers | [Assertion Helpers Section](#dspyassertionhelpers) |
+| Predict | :doc:`Predict Section <dspypredict>` |
+| Retrieve | :doc:`Retrieve Section <dspyretrieve>` |
+| ChainOfThought | :doc:`ChainOfThought Section <dspychainofthought>` |
+| ChainOfThoughtWithHint | :doc:`ChainOfThoughtWithHint Section <dspychainofthoughtwithhint>` |
+| MultiChainComparison | :doc:`MultiChainComparison Section <dspymultichaincomparison>` |
+| ReAct | :doc:`ReAct Section <dspyreact>` |
+| Assertion Helpers | :doc:`Assertion Helpers Section <dspyassertionhelpers>` |
 
 ## dspy.Predict
 
-The `Predict` class in DSPy uses a `signature` to define the input and output fields for a predictive model. The `signature` also provides instructions for the language model on how to generate predictions. If the `signature` is a string, it is processed to extract the input and output fields, generate instructions, and create a template for the specified `signature` type. For more details on `signatures`, refer to the [DSPy Signatures Documentation](../signatures/signatures.md).
+The `Predict` class in DSPy uses a `signature` to define the input and output fields for a predictive model. The `signature` also provides instructions for the language model on how to generate predictions. If the `signature` is a string, it is processed to extract the input and output fields, generate instructions, and create a template for the specified `signature` type. For more details on `signatures`, refer to the :doc:`DSPy Signatures Documentation <../signatures/signatures>`.
 
 ### Constructor
 
@@ -86,7 +86,8 @@ my_module = dspy.Predict(MyTask)
 pred = my_module(input1="example input")
 
 print(f"Predicted Output: {pred.output1}")
-```
+
+..
 
 This handler is used to ignore assertion failures and return None.
 
@@ -275,7 +276,7 @@ print(f"Predicted Answer: {pred.answer}")
 
 The constructor initializes the `ChainOfThoughtWithHint` class and sets up its attributes, inheriting from the `Predict` class. This class enhances the `ChainOfThought` class by offering an additional option to provide hints for reasoning. Two distinct signature templates are created internally depending on the presence of the hint.
 
-```python
+.. code-block:: python
 class ChainOfThoughtWithHint(Predict):
     def __init__(self, signature, rationale_type=None, activated=True, **config):
         super().__init__(signature, **config)
@@ -339,7 +340,8 @@ pred = generate_answer(question=question, hint=hint)
 
 print(f"Question: {question}")
 print(f"Predicted Answer: {pred.answer}")
-```
+
+..
 
 
 ## dspy.MultiChainComparison
@@ -432,7 +434,7 @@ The constructor initializes the `ReAct` class and sets up its attributes. It is 
 
 Internally, the class follows a sequential process: Thoughts (or reasoning) lead to Actions (such as queries or activities). These Actions then result in Observations (like results or responses), which subsequently feedback into the next Thought. This cycle is maintained for a predefined number of iterations.
 
-```python
+.. code-block:: python
 import dsp
 import dspy
 from ..primitives.program import Module
@@ -500,4 +502,5 @@ result = react_module(question=question)
 
 print(f"Question: {question}")
 print(f"Final Predicted Answer (after ReAct process): {result.answer}")
-```
+
+..
