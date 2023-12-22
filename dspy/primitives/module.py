@@ -4,23 +4,29 @@ import ujson
 
 class BaseModule:
     """
-    Base class for all modules in DSPy.
+    Base class for all modules in DSPy providing common interfaces and behaviors.
+
+    The BaseModule serves as a foundation for creating complex modules that may contain
+    parameters, sub-modules, and custom behaviors during training and inference.
     """
 
     def __init__(self):
         """
-        Initialize a new instance of the BaseModule class.
+        Initializes a new BaseModule instance.
+
+        This constructor sets up the basic structure for further customization in derived module classes.
         """
         pass
 
     def named_parameters(self):
         """
-        Get the named parameters of the module.
-
-        Unlike PyTorch, this method also handles (non-recursive) lists of parameters.
+        Retrieves a list of tuples, each containing the name and value of a parameter.
+        
+        This method returns named parameters for the module itself and any sub-modules, including parameters
+        contained within non-recursive lists, tuples, and dictionaries.
 
         Returns:
-            list: A list of tuples, where each tuple contains the name of a parameter and the parameter itself.
+            List[Tuple[str, Parameter]]: A list of tuples, where each tuple contains the name of a parameter and the parameter itself.
         """
 
         from dspy.predict.parameter import Parameter
@@ -64,19 +70,23 @@ class BaseModule:
 
     def deepcopy(self):
         """
-        Create a deep copy of the module.
+        Creates a fully independent deep copy of the module and its associated sub-modules and parameters.
+
+        This is useful for creating separate instances of a module for different tasks or datasets.
 
         Returns:
-            BaseModule: A deep copy of the module.
+            BaseModule: A new instance of the module with all internal elements deep-copied.
         """
         return copy.deepcopy(self)
 
     def reset_copy(self):
         """
-        Create a reset copy of the module.
+        Creates a deep copy of the module with reset parameters.
+        
+        Each parameter within the copy is reset back to its initial state.
 
         Returns:
-            BaseModule: A reset copy of the module.
+            BaseModule: A new instance of the module with reset parameters.
         """
         obj = copy.deepcopy(self)
         
@@ -106,7 +116,9 @@ class BaseModule:
     
     def save(self, path):
         """
-        Save the state of the module to a file.
+        Saves the current state of the module as a JSON representation to the specified file.
+        
+        The saved state includes the states of all module parameters.
 
         Args:
             path (str): The path to the file where the state should be saved.
