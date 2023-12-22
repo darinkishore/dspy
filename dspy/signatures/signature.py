@@ -62,6 +62,7 @@ class Signature(metaclass=SignatureMeta):
         self.signature = signature
         self.instructions = instructions
         self.fields = {}
+        self.prompt_skeleton = None
         self.parse_structure()
     
     def __getattr__(self, attr):
@@ -74,6 +75,20 @@ class Signature(metaclass=SignatureMeta):
         return {k: v for k, v in self.fields.items()}
 
     def parse_structure(self):
+        # This is a placeholder for demonstration purposes
+        sampled_signatures = self.sample_variations(k=2)
+        # Incorporate the prompt skeleton and sampled signature content
+        if self.prompt_skeleton:
+            for signature in sampled_signatures:
+                # Replace placeholders with actual signature content
+                # This example assumes there are placeholders in the skeleton
+                self.prompt_skeleton = self.prompt_skeleton.replace('${placeholder}', signature.signature)
+        else:
+            inputs_str, outputs_str = self.signature.split("->")
+            for name in inputs_str.split(","):
+                self.add_field(name.strip(), InputField())
+            for name in outputs_str.split(","):
+                self.add_field(name.strip(), OutputField())
         inputs_str, outputs_str = self.signature.split("->")
         for name in inputs_str.split(","):
             self.add_field(name.strip(), InputField())
@@ -128,6 +143,12 @@ class Signature(metaclass=SignatureMeta):
     def output_fields(self):
         return {k: v for k, v in self.fields.items() if isinstance(v, OutputField)}
 
+    def sample_variations(self, k):
+        # Placeholder for the actual sampling logic
+        sampled_instances = ['variation_{}'.format(i) for i in range(k)]
+        # Convert strings to Signature instances, this is just a placeholder
+        return [Signature(signature=var, instructions='') for var in sampled_instances]
+
     def __repr__(self):
         s = []
         for name, _ in self.fields.items():
@@ -136,7 +157,7 @@ class Signature(metaclass=SignatureMeta):
                 s.append(f"- {name} = {value}")
             else:
                 s.append(f"- {name} = [field not attached]")
-        return f'{self.__class__.__name__}\n' + '\n'.join(s)
+        prompt_skeleton_repr = 'Prompt Skeleton: ' + str(self.prompt_skeleton) if self.prompt_skeleton else 'Prompt Skeleton: Not defined'\n        sampled_sigs_repr = 'Sampled signatures: ' + str(self.sample_variations(k=2)) if hasattr(self, 'sample_variations') else 'Sampled signatures: Not defined'\n        return f'{self.__class__.__name__}\n{prompt_skeleton_repr}\n{sampled_sigs_repr}\n' + '\n'.join(s)
 
     def __eq__(self, __value: object) -> bool:
         return self._template == __value._template
