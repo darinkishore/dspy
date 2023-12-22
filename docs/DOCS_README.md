@@ -43,7 +43,11 @@ And open your browser at http://0.0.0.0:8000/ to view the generated docs.
 ##### Watch Docs
 
 We recommend using sphinx-autobuild during development, which provides a live-reloading
-server, that rebuilds the documentation and refreshes any open pages automatically when
+## Retrieve Module
+
+For comprehensive information about the `retrieve` module, check out the [Retrieve Module Documentation](retrieve.md).
+
+The `retrieve` module provides a way to retrieve relevant information from a dataset based on a query. It is designed to work seamlessly within the DSPy framework, aiding in the retrieval tasks that form the backbone of many language and data processing operations.server, that rebuilds the documentation and refreshes any open pages automatically when
 changes are saved. This enables a much shorter feedback loop which can help boost
 productivity when writing documentation.
 
