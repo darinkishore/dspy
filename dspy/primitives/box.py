@@ -90,6 +90,13 @@ Then depending on the branch_idx, we'll return a fixed set of N candidates. But 
 
 
 class BoxType(type):
+    """
+    A metaclass for the Box class that defines special methods dynamically.
+
+    BoxType automates the creation of special methods like arithmetic, item access, and comparison
+    operations for the Box class to act on its internal value. This allows Box instances to behave similar
+    to their value types in expressions, while being wrapped in a Box object.
+    """
     # List of operations to override
     ops = [
         # Arithmetic operations
@@ -110,6 +117,17 @@ class BoxType(type):
     ]
 
     def __init__(cls, name, bases, attrs):
+        """
+        Initialize the BoxType class and dynamically add special methods to the class.
+
+        This method iterates over a predefined list of operations and creates corresponding special methods
+        that delegate the operations to the internal value of the Box instances.
+
+        Args:
+            name (str): Name of the class being created.
+            bases (tuple): Base classes of the class being created.
+            attrs (dict): Attributes dictionary of the class being created.
+        """
         def create_method(op):
             def method(self, other=None):
                 if op in ['len', 'keys', 'values', 'items']:
@@ -128,29 +146,96 @@ class BoxType(type):
         super().__init__(name, bases, attrs)
 
 class Box(metaclass=BoxType):
+    """
+    A wrapper class that allows operations to be applied to its value as if it were the value type itself.
+
+    Box takes a value and acts as a proxy to this value, allowing special methods defined in BoxType
+    to perform operations directly on the value. The class provides a way to use regular Python syntax
+    for operations while manipulating Box instances.
+
+    Attributes:
+        _value: The value wrapped by the Box instance.
+        _source: An optional attribute to track the source of the value.
+    """
     def __init__(self, value, source=False):
+        """
+        Initialize a Box instance with a specific value and an optional source.
+
+        Args:
+            value: The value to be wrapped by the Box.
+            source (optional): The source of the value, used for tracking. Defaults to False.
+        """
         self._value = value
         self._source = source
 
     def __repr__(self):
+        """
+        Return the official string representation of the Box instance.
+
+        Returns:
+            str: A string that represents the Box instance and its value.
+        """
         return repr(self._value)
 
     def __str__(self):
+        """
+        Return the string form of the Box's value.
+
+        Returns:
+            str: The string representation of the Box's internal value.
+        """
         return str(self._value)
     
     def __bool__(self):
+        """
+        Return the boolean value of the Box's value.
+
+        When a Box object is used in a context where a boolean value is needed (e.g., in conditionals),
+        this method will return the boolean evaluation of its internal value.
+
+        Returns:
+            bool: The boolean result of evaluating the Box's value.
+        """
         return bool(self._value)
     
     # if method is missing just call it on the _value
     def __getattr__(self, name):
+        """
+        Delegate attribute access to the Box's value.
+
+        This method is called when an attribute lookup has not found the attribute in the usual places.
+        It delegates the lookup to the Box's value attribute.
+
+        Args:
+            name (str): The name of the attribute being accessed.
+
+        Returns:
+            Box: A new Box instance wrapping the result of the attribute access on the internal value.
+
+        Raises:
+            AttributeError: If the attribute does not exist on the value.
+        """
         return Box(getattr(self._value, name))
 
-    # # Unlike the others, this one collapses to a bool directly
-    # def __eq__(self, other):
-    #     if isinstance(other, Box):
-    #         return self._value == other._value
-    #     else:
-    #         return self._value == other
+    # Unlike the others, this one collapses to a bool directly
+    def __eq__(self, other):
+        """
+        Compare the Box's value with another Box's value or any other value.
+
+        Returns True if both have the same value, False otherwise. If the other
+        is also a Box, the comparison is made between the values they each contain.
+
+        Args:
+            other: A Box instance or any value to compare against the Box's value.
+
+        Returns:
+            bool: The result of the equality comparison.
+
+        """
+        if isinstance(other, Box):
+            return self._value == other._value
+        else:
+            return self._value == other
 
     # def __ne__(self, other):
     #     return not self.__eq__(other)
