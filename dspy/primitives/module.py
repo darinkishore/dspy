@@ -4,7 +4,10 @@ import ujson
 
 class BaseModule:
     """
-    Base class for all modules in DSPy.
+    Base class for all modules in the DSPy framework.
+
+    Provides functionalities common to all module classes such as parameter handling,
+    creating deep copies, and saving or loading module states.
     """
 
     def __init__(self):
@@ -33,6 +36,7 @@ class BaseModule:
                 visited.add(id(param_value))
                 named_parameters.append((param_name, param_value))
 
+        # Iterate over all attributes of the instance, extracting named parameters
         for name, value in self.__dict__.items():
             if isinstance(value, Parameter):
                 add_parameter(name, value)
@@ -55,7 +59,10 @@ class BaseModule:
 
     def parameters(self):
         """
-        Get the parameters of the module.
+        Retrieve all the parameters of the module as a flat list.
+
+        This method simplifies accessing all parameters by returning them without their names,
+        making it useful for operations that don't require named parameter information.
 
         Returns:
             list: A list of parameters.
@@ -73,7 +80,10 @@ class BaseModule:
 
     def reset_copy(self):
         """
-        Create a reset copy of the module.
+        Create a reset copy of the module with all parameters restored to their initial state.
+
+        This method duplicates the module, and then resets all parameters to their original states,
+        as defined by their respective reset logic, effectively 'reinitializing' them.
 
         Returns:
             BaseModule: A reset copy of the module.
@@ -96,7 +106,11 @@ class BaseModule:
     
     def load_state(self, state):
         """
-        Load the state of the module from a dictionary.
+        Restore the state of the module from a given dictionary of parameter states.
+
+        This method takes a dictionary where keys match parameter names and values are
+        their associated states, and applies these states to the corresponding parameters
+        within the module.
 
         Args:
             state (dict): A dictionary representing the state of the module.
