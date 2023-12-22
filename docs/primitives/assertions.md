@@ -1,5 +1,7 @@
 
 ## Suggest
+"""
+The `Suggest` class is a type of `Constraint` that represents a suggestion in the DSPy framework.
 The `Suggest` class is a type of `Constraint` that represents a suggestion in the DSPy framework. It takes a boolean result and an optional message as parameters. If the result is `False`, it raises a `DSPySuggestionError` unless `bypass_suggest` is set in the settings.
 
 Example usage:
@@ -8,6 +10,8 @@ suggestion = Suggest(result=True, msg="This is a test suggestion")
 ```
 
 ## Constraint
+"""
+The `Constraint` class is a base class for `Assert` and `Suggest` in the DSPy framework.
 The `Constraint` class is a base class for `Assert` and `Suggest`. It takes a boolean result and an optional message as parameters.
 
 Example usage:
@@ -26,7 +30,8 @@ def test_function():
 ```
 
 ## bypass_suggest_handler
-The `bypass_suggest_handler` function is an assertion handler that bypasses suggestions only. It takes a function as a parameter and returns a wrapper function that bypasses suggestions when called.
+"""
+The `bypass_suggest_handler` function is an assertion handler that skips the execution of suggestion checks in the DSPy framework. It takes a function as a parameter and returns a wrapper function that bypasses suggestions when called.
 
 Example usage:
 ```python
@@ -36,7 +41,8 @@ def test_function():
 ```
 
 ## bypass_assert_handler
-The `bypass_assert_handler` function is an assertion handler that bypasses assertions only. It takes a function as a parameter and returns a wrapper function that bypasses assertions when called.
+"""
+The `bypass_assert_handler` function is an assertion handler that skips the execution of assertion checks in the DSPy framework. It takes a function as a parameter and returns a wrapper function that bypasses assertions when called.
 
 Example usage:
 ```python
@@ -46,7 +52,8 @@ def test_function():
 ```
 
 ## assert_no_except_handler
-The `assert_no_except_handler` function is an assertion handler that ignores assertion failures and returns `None`. It takes a function as a parameter and returns a wrapper function that ignores assertion failures when called.
+"""
+The `assert_no_except_handler` function is an assertion handler that catches assertion errors and returns `None` in the DSPy framework. It takes a function as a parameter and returns a wrapper function that ignores assertion failures when called.
 
 Example usage:
 ```python
@@ -56,7 +63,8 @@ def test_function():
 ```
 
 ## suggest_backtrack_handler
-The `suggest_backtrack_handler` function is an assertion handler for backtracking suggestions. It takes a function, a boolean `bypass_suggest`, and an integer `max_backtracks` as parameters. It returns a wrapper function that re-runs the latest predictor up to `max_backtracks` times, with updated signature if a suggestion fails.
+"""
+The `suggest_backtrack_handler` function is an assertion handler that retries the computation when a suggestion fails in the DSPy framework. It takes a function, a boolean `bypass_suggest`, and an integer `max_backtracks` as parameters. It returns a wrapper function that re-runs the latest predictor up to `max_backtracks` times, with updated signature if a suggestion fails.
 
 Example usage:
 ```python
@@ -66,7 +74,8 @@ def test_function():
 ```
 
 ## handle_assert_forward
-The `handle_assert_forward` function is used to handle assertions. It wraps the `forward` method of a module with an assertion handler. It takes an assertion handler and handler arguments as parameters.
+"""
+The `handle_assert_forward` function function is used to handle assertions. It wraps the `forward` method of a module with an assertion handler. It takes an assertion handler and handler arguments as parameters.
 
 Example usage:
 ```python
@@ -74,7 +83,8 @@ forward = handle_assert_forward(assertion_handler, **handler_args)
 ```
 
 ## assert_transform_module
-The `assert_transform_module` function is used to transform a module to handle assertions. It replaces the `forward` method of the module with a version that handles assertions. It takes a module, an assertion handler, and handler arguments as parameters.
+"""
+The `assert_transform_module` function is used to transform a module to handle assertions. It takes a module, an assertion handler, and handler arguments as parameters.
 
 Example usage:
 ```python
