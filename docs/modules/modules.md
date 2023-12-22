@@ -31,16 +31,14 @@ class Predict(Parameter):
         self.reset()
 
         if isinstance(signature, str):
-            inputs, outputs = signature.split("->")
-            inputs, outputs = inputs.split(","), outputs.split(",")
-            inputs, outputs = [field.strip() for field in inputs], [field.strip() for field in outputs]
+            inputs, outputs = self.process_signature(signature)
 
             assert all(len(field.split()) == 1 for field in (inputs + outputs))
 
             inputs_ = ', '.join([f"`{field}`" for field in inputs])
             outputs_ = ', '.join([f"`{field}`" for field in outputs])
 
-            instructions = f"""Given the fields {inputs_}, produce the fields {outputs_}."""
+            instructions = self.generate_instructions(inputs, outputs)
 
             inputs = {k: InputField() for k in inputs}
             outputs = {k: OutputField() for k in outputs}
