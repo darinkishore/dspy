@@ -10,12 +10,12 @@ import uuid
 
 def setup_logger():
     """
-    Set up a logger for the module.
+    Set up and configure a logger for the `assertions` module.
 
-    The logger logs messages with the level DEBUG to a file named "assertion.log".
+    This logger is configured to use the DEBUG level and to write logs to the file "assertion.log".
 
     Returns:
-        Logger: The set up logger.
+        logging.Logger: The configured logger with DEBUG level and file handler.
     """
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
@@ -45,7 +45,12 @@ def _build_error_msg(feedback_msgs):
 
 
 class DSPyAssertionError(AssertionError):
-    """Custom exception raised when a DSPy `Assert` fails."""
+    """
+    Exception raised when a DSPy assertion fails.
+
+    This custom error extends the base AssertionError and includes the assertion ID, message, and optionally
+    the state of the system at the time of the failure.
+    """
 
     def __init__(self, id: str, msg: str, state: Any = None) -> None:
         """
@@ -63,7 +68,12 @@ class DSPyAssertionError(AssertionError):
 
 
 class DSPySuggestionError(AssertionError):
-    """Custom exception raised when a DSPy `Suggest` fails."""
+    """
+    Exception raised when a DSPy suggestion fails.
+
+    Similar to DSPyAssertionError, but tailored for suggestions rather than assertions. It holds additional
+    reference to the 'target_module' towards which the suggestion was directed.
+    """
 
     def __init__(
         self, id: str, msg: str, target_module: Any = None, state: Any = None
@@ -88,6 +98,12 @@ class DSPySuggestionError(AssertionError):
 
 
 class Constraint:
+    """
+    Base class representing a logical constraint in DSPy.
+
+    This class is intended to be the foundation of specific types of constraints, such as assertions and
+    suggestions, and holds a unique ID, a result, an optional message, and an optional target module.
+    """
     def __init__(self, result: bool, msg: str = "", target_module=None):
         self.id = str(uuid.uuid4())
         self.result = result
@@ -98,7 +114,12 @@ class Constraint:
 
 
 class Assert(Constraint):
-    """DSPy Assertion"""
+    """
+    Class representing an assertion in DSPy.
+
+    When called, it evaluates a boolean result and raises an error or logs a message depending on the
+    result and the configuration settings.
+    """
 
     def __call__(self) -> bool:
         """
@@ -155,6 +176,19 @@ class Suggest(Constraint):
 
 
 def noop_handler(func):
+    """
+    Decorator that creates a version of the passed function where all assertions and suggestions are
+    disabled (turned into no-operations).
+
+    This is used to 'wrap' a function such that the function's behavior is preserved while ignoring any
+    constraints (assertions or suggestions) without triggering any errors.
+
+    Args:
+        func: The function to wrap.
+
+    Returns:
+        A wrapped version of the function with assertions and suggestions turned off.
+    """
     """Handler to bypass assertions and suggestions.
 
     Now both assertions and suggestions will become noops.
@@ -168,6 +202,18 @@ def noop_handler(func):
 
 
 def bypass_suggest_handler(func):
+    """
+    Decorator that modifies a function to bypass only suggestion checks.
+
+    If a suggestion within the function fails, it will only be logged and no exception will be raised. Assertions
+    will still raise an exception if they fail.
+
+    Args:
+        func: The function to be modified.
+
+    Returns:
+        A decorated version of the function which logs failed suggestions instead of raising errors.
+    """
     """Handler to bypass suggest only.
 
     If a suggestion fails, it will be logged but not raised.
@@ -182,6 +228,19 @@ def bypass_suggest_handler(func):
 
 
 def bypass_assert_handler(func):
+    """
+    Decorator that creates a version of the passed function where all assertions are
+    ignored and treated as if they passed.
+
+    It's similar to 'noop_handler' but it specifically targets assertions, letting
+    suggestions work normally.
+
+    Args:
+        func: The function to process.
+
+    Returns:
+        A decorated function where assertions within the body are effectively 'no-ops'.
+    """
     """Handler to bypass assertion only.
 
     If a assertion fails, it will be logged but not raised.
@@ -208,6 +267,20 @@ def assert_no_except_handler(func):
 
 
 def suggest_backtrack_handler(func, bypass_suggest=True, max_backtracks=2):
+    """
+    Decorator that modifies a function to handle suggestions by backtracking.
+
+    If a suggestion fails within the function, the decorator can backtrack and re-run the prediction with updated
+    information up to a specified number of times defined by 'max_backtracks'.
+
+    Args:
+        func: The function to modify with backtracking capabilities.
+        bypass_suggest (bool, optional): Determines whether to raise an exception or simply log suggestion failures.
+        max_backtracks (int, optional): The maximum number of backtracks allowed upon a suggestion failure.
+
+    Returns:
+        A decorated function that handles suggestions by backtracking, with the potential to retry the process.
+    """
     """Handler for backtracking suggestion.
 
     Re-run the latest predictor up to `max_backtracks` times,
@@ -318,6 +391,28 @@ default_assertion_handler = suggest_backtrack_handler
 
 
 def assert_transform_module(
+    module, 
+    assertion_handler=default_assertion_handler, 
+    **handler_args
+):
+    """
+    Apply an assertion handler to a module by transforming its 'forward' method.
+
+    After the transformation, the 'forward' method will be wrapped by the specified assertion_handler, effectively
+    managing assertion handling within the module.
+
+    Args:
+        module: The module whose 'forward' method will be transformed.
+        assertion_handler (Callable, optional): The function acting as the assertion handler to be applied. Defaults to
+            the 'default_assertion_handler'.
+        **handler_args: Optional keyword arguments to pass to the assertion_handler.
+
+    Returns:
+        The modified module with transformed 'forward' method.
+
+    Raises:
+        ValueError: If the module does not have a 'forward' method or if it already has a '_forward' method set.
+    """
     module, assertion_handler=default_assertion_handler, **handler_args
 ):
     """
