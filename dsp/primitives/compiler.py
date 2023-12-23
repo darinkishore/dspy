@@ -46,7 +46,8 @@ def convert_to_training_point2(y, inputs, outputs, template):
     assert len(inputs) + len(outputs) == len(template.fields)
 
     y_ = dsp.Example(**{f: y[f] for f in inputs}, demos=[])
-    prompt = template(y_, show_guidelines=False)
+    # Generate prompt with new prompt creation process
+    prompt = template.generate_prompt_with_skeleton(y_)
 
     completion = y[outputs[0]]
     output_fields = template.fields[len(inputs):]
@@ -161,7 +162,8 @@ def finetune(training_data, target):
 # 4. Return updated program.
 def compile(program, examples, target='ada'):
     training_data = simulate(program, examples)
-    compiled_lm = finetune(training_data, target=target)
+    # Generate prompts with new signature variations
+    compiled_lm = finetune([example.generate_prompt_with_skeleton() for example in training_data], target=target)
 
     def compiled_program(*args, **kwargs):
         with dsp.settings.context(compiled_lm=compiled_lm, compiling=False):
