@@ -343,7 +343,23 @@ Guidance, LMQL, RELM, and Outlines are all exciting new libraries for controllin
 This is very useful in many settings, but it's generally focused on low-level, structured control of a single LM call. It doesn't help ensure the JSON (or structured output) you get is going to be correct or useful for your task.
 
 In contrast, **DSPy** automatically optimizes the prompts in your programs to align them with various task needs, which may also include producing valid structured ouputs. That said, we are considering allowing **Signatures** in **DSPy** to express regex-like constraints that are implemented by these libraries.
-</details>
+</details>## What to Know Before Working on Any Task in DSPy
+
+Before engaging with tasks in DSPy, it is crucial to familiarize oneself with the framework's key concepts and operations. This knowledge will not only facilitate smooth development but also ensure that interactions with language and retrieval models are performed effectively. Below are the foundational aspects that developers and users of DSPy need to be well-versed in:
+
+- **Understanding of Signature Mechanism**: Recognizing how DSPy uses signatures to define the interfaces for modules is essential. Signatures prescribe the expected inputs and outputs, guiding how tasks and language model calls are structured.
+
+- **Familiarity with Module Composition**: DSPy's efficacy comes from its modular architecture. Being able to comprehend and navigate the interconnection of modules is significant for effectively building and modifying tasks within the framework.
+
+- **Compiler Workflow**: Knowledge of the compiler process in DSPy is vital. The compiler translates high-level module instructions into exact prompts or fine-tuning routines, adapting to the most effective strategies for interaction with the language models.
+
+- **Teleprompting Strategies**: Understanding the various teleprompting techniques DSPy provides is central to harnessing automatic prompt crafting and optimization tools, raising efficiency in deploying language models.
+
+- **Evaluation Protocols**: Familiarity with DSPy's evaluation protocols ensures that the outputs of language models are appraised correctly, considering criteria such as correctness, coherence, and task alignment.
+
+- **Adherence to Design Principles**: DSPy upholds design principles like modularity, systematic optimization, and extensibility. Adhering to these principles is imperative for contributing to DSPy's ecosystem while preserving its design philosophy.
+
+Mastering these elements of DSPy will enable contributors to effectively leverage the sophisticated capabilities offered by the framework and to innovate on top of the existing tools for advanced language and retrieval model applications.
 
 
 
