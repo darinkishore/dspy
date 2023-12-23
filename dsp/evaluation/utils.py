@@ -9,12 +9,12 @@ from IPython.display import display
 from dsp.utils import EM, F1, HotPotF1
 
 
-def evaluateRetrieval(fn, dev, metric=None):
+def evaluateRetrieval(fn, openai_predict_fn, dev, metric=None):
     data = []
 
     for example in tqdm.tqdm(dev):
         question = example.question
-        prediction = fn(question)
+        prediction = openai_predict_fn(question)
 
         d = dict(example)
 
@@ -32,12 +32,12 @@ def evaluateRetrieval(fn, dev, metric=None):
     display(df.style.set_table_styles([{'selector': 'th', 'props': [('text-align', 'left')]}, {'selector': 'td', 'props': [('text-align', 'left')]}]))
 
 
-def evaluateAnswer(fn, dev, metric=EM):
+def evaluateAnswer(fn, openai_predict_fn, dev, metric=EM):
     data = []
 
     for example in tqdm.tqdm(dev):
         question = example.question
-        prediction = fn(question)
+        prediction = openai_predict_fn(question)
 
         d = dict(example)
 
@@ -58,12 +58,12 @@ def evaluateAnswer(fn, dev, metric=EM):
 
 
 
-def evaluate(fn, dev, metric=EM):
+def evaluate(fn, openai_predict_fn, dev, metric=EM):
     data = []
 
     for example in tqdm.tqdm(dev):
         question = example.question
-        prediction = fn(question)
+        prediction = openai_predict_fn(question)
 
         d = dict(example)
 
@@ -83,5 +83,12 @@ def evaluate(fn, dev, metric=EM):
     display(df.style.set_table_styles([{'selector': 'th', 'props': [('text-align', 'left')]}, {'selector': 'td', 'props': [('text-align', 'left')]}]))
 
     return percentage
+
+# Check OpenAI library version and import syntax functions accordingly
+import openai
+if openai.__version__ == '0.28':
+    from .syntax_v028 import *
+elif openai.__version__ == '1.0':
+    from .syntax_v1 import *
 
 
