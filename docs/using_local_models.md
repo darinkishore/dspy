@@ -107,6 +107,11 @@ Initialize the `HFClientVLLM` within your program with the desired parameters. H
    lm = dspy.HFClientVLLM(model="mosaicml/mpt-7b", port=8000, url="http://localhost")
    ```
 
+# Changes in Sweep Configuration
+The `sweep.yaml` file has recently been updated to include a new directory in the `blocked_dirs` list. Specifically, the directory newly added to the list is `./sweep.yaml`. The decision to block this directory was made to prevent automated changes to the Sweep configuration file, which could potentially disrupt the intended behavior of the tool and result in unintended consequences for the project.
+
+As a result of this change, any modifications made to files within the `./sweep.yaml` directory will not be reflected when using the Sweep tool. It is important for contributors to be aware of this and consider the implications when making changes to the project. To ensure a smooth workflow while using the Sweep tool, users are advised to refrain from making changes in the blocked directory.
+
    Customize the `model`, `port`, `url`, and `max_tokens` according to your requirements. The `model` parameter should be set to the specific Hugging Face model ID you wish to use.
 
 Please refer to the [official vLLM repository](https://github.com/vllm-project/vllm) for more detailed information and documentation.
