@@ -7,6 +7,7 @@ import subprocess
 
 import dsp
 from datasets.fingerprint import Hasher
+from dsp.modules.signature_sampler import SignatureSampler
 
 if os.environ.get('DSP_NOTEBOOK_CACHEDIR'):
     training_data_directory = os.path.join(os.environ.get('DSP_NOTEBOOK_CACHEDIR'), 'compiler')
@@ -159,9 +160,17 @@ def finetune(training_data, target):
     return ft
 
 # 4. Return updated program.
-def compile(program, examples, target='ada'):
-    training_data = simulate(program, examples)
-    compiled_lm = finetune(training_data, target=target)
+def compile(self, program, examples, k, target='ada'):
+    signature_sampler = SignatureSampler()
+    sampled_signatures = signature_sampler.sample(program.signatures, k)
+    prompt = ''
+    for signature in sampled_signatures:
+        prompt += signature.instructions.format(*signature.placeholders)
+    compiled_prompt = program.compile(prompt)
+    # Here add code to persist the compiled prompt.
+    # This can be writing to a file or storing it in a database.
+    
+    compiled_lm = finetune(compiled_prompt, target=target)
 
     def compiled_program(*args, **kwargs):
         with dsp.settings.context(compiled_lm=compiled_lm, compiling=False):
