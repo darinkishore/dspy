@@ -2,6 +2,7 @@ import dsp
 import dspy
 from dspy.teleprompt.teleprompt import Teleprompter
 from dspy.signatures import Signature
+from dspy.signatures.signature_sampler import SignatureSampler
 from dspy.evaluate.evaluate import Evaluate
 
 """
@@ -39,6 +40,16 @@ class GenerateInstructionGivenAttempts(Signature):
         proposed_prefix_for_output_field = dspy.OutputField(desc="The string at the end of the prompt, which will help the model start solving the task")
 
 class SignatureOptimizer(Teleprompter):
+    compiled_prompts = []  # List to hold the persisted prompts and corresponding Signatures
+
+    # Helper method for persisting a prompt with its Signature
+    def persist_prompt(self, prompt, signature):
+        self.compiled_prompts.append((prompt, signature))
+
+    # Helper method for executing Python code from a prompt
+    def execute_code(self, prompt, signature):
+        # Execution logic will be implemented here
+        pass
     def __init__(self, metric=None, breadth=10, depth=3, init_temperature=1.4, prompt_model="gpt-3.5-turbo-1106", verbose=False):
         self.metric = metric
         self.breadth = breadth
@@ -85,8 +96,9 @@ class SignatureOptimizer(Teleprompter):
         candidates = {}
         evaluated_candidates = {}
 
-        # Seed the prompt optimizer zero shot with just the instruction, generate BREADTH new prompts
-        for predictor in module.predictors():
+        # Seed the prompt optimizer, sample k signature variations and generate new prompts
+        self.signature_sampler = SignatureSampler()
+        for predictor in self.signature_sampler.sample(module.predictors(), k=self.breadth):
             basic_instruction = predictor.extended_signature.instructions
             basic_prefix = predictor.extended_signature.fields[-1].name
             with dspy.settings.context(lm=self.prompt_model):
@@ -115,6 +127,8 @@ class SignatureOptimizer(Teleprompter):
 
                 # For each candidate
                 for c in candidates_:
+                    # Persist the compiled prompt with the signature variation
+                    self.persist_prompt(instruction, predictor.extended_signature)
                     
                     # Get the candidate instruction and prefix 
                     instruction, prefix = c.proposed_instruction.strip('"').strip(), c.proposed_prefix_for_output_field.strip('"').strip()
