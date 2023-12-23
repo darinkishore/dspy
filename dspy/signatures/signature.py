@@ -1,5 +1,6 @@
 import re
 import dsp
+from collections import OrderedDict
 
 from .field import Field, InputField, OutputField
 import threading
@@ -58,9 +59,11 @@ class SignatureMeta(type):
         return super().__getattr__(attr)    
 
 class Signature(metaclass=SignatureMeta):
-    def __init__(self, signature: str = "", instructions: str = ""):
+    dynamic_placeholders = None  # Holds the dynamic placeholder objects
+    def __init__(self, signature: str = "", instructions: str = "", dynamic_placeholders: dict = None):
         self.signature = signature
         self.instructions = instructions
+        self.dynamic_placeholders = dynamic_placeholders if dynamic_placeholders is not None else OrderedDict()
         self.fields = {}
         self.parse_structure()
     
@@ -81,8 +84,11 @@ class Signature(metaclass=SignatureMeta):
             self.add_field(name.strip(), OutputField())
 
     def attach(self, **kwargs):
-        for key, (prefix, desc) in kwargs.items():
-            field_type = self.fields.get(key)
+        for key, value in kwargs.items():
+            if key in self.dynamic_placeholders:
+                self.dynamic_placeholders[key] = value
+                continue
+                        field_type = self.fields.get(key)
             if not field_type:
                 raise ValueError(f"{key} does not exist in this signature")
             field_map = {
