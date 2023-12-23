@@ -1,3 +1,13 @@
+# Overview of Teleprompters in DSPy
+
+Teleprompters and compilers play a central role in the DSPy framework by enabling efficient and systematic use of language models (LMs). Teleprompters in DSPy serve as modules that can automate the process of prompt engineering. With these tools, users can bypass the manual and often laborious task of crafting prompts for various LMs. This automated prompting is achieved through the 'tele-' concept, which denotes automatic prompting at a distance, hence the name teleprompter.
+
+Compilers within DSPy also contribute significantly to optimizing language model interactions. By automatically adapting tasks to the most effective prompting strategies in real-time, compilers ensure that LMs operate at their fullest potential with minimal human intervention. This collaborative functionality of teleprompters and compilers is essential for the framework's ability to handle complex linguistic tasks and fine-tuned interactions with foundational models.
+
+Referenced from the project description in the `sweep.yaml` file, teleprompters not only facilitate prompt engineering but also work in tandem with compilers to systematically fine-tune and adapt LMs for specific tasks or datasets. They support various reasoning approaches, including chain-of-thought reasoning, and enable language models to perform an emulation of human-like problem-solving processes. Moreover, teleprompters contribute to self-improvement loops where LMs learn from past interactions to continually enhance performance.
+
+By detailing this workflow and providing tools like teleprompters and compilers, DSPy supports the creation of advanced applications in NLP and beyond. The documentation in this file reflects the capabilities and integration of teleprompters as outlined in the `sweep.yaml` file.
+
 # Teleprompters Documentation
 
 Teleprompters are powerful optimizers (included in DSPy) that can learn to bootstrap and select effective prompts for the modules of any program. (The "tele-" in the name means "at a distance", i.e., automatic prompting at a distance.)
