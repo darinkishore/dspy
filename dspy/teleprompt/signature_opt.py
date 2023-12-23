@@ -1,6 +1,7 @@
 import dsp
 import dspy
 from dspy.teleprompt.teleprompt import Teleprompter
+from dspy.signatures.sampler import SignatureSampler
 from dspy.signatures import Signature
 from dspy.evaluate.evaluate import Evaluate
 
@@ -85,7 +86,8 @@ class SignatureOptimizer(Teleprompter):
         candidates = {}
         evaluated_candidates = {}
 
-        # Seed the prompt optimizer zero shot with just the instruction, generate BREADTH new prompts
+        sampler = SignatureSampler()
+        # Seed the prompt optimizer with sampled 'k' signature variations before optimization
         for predictor in module.predictors():
             basic_instruction = predictor.extended_signature.instructions
             basic_prefix = predictor.extended_signature.fields[-1].name
@@ -131,7 +133,9 @@ class SignatureOptimizer(Teleprompter):
                             print(f"i: {predictor.extended_signature.instructions}")
                             print(f"p: {predictor.extended_signature.fields[-1].name}")
                             print()
-                    score = evaluate(module_clone, devset=devset, **eval_kwargs)
+                    field_values = {'instruction': instruction, 'prefix': prefix}
+                    dynamic_prompt = p_new.extended_signature.fill_prompt(field_values)
+                    score = evaluate(dynamic_prompt, devset=devset, **eval_kwargs)
                     total_calls += 1
                     if (self.verbose):
                         print(f"----------------")
