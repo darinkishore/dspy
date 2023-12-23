@@ -4,8 +4,7 @@ from typing import Any, Literal, Optional, cast
 
 import backoff
 import openai
-import openai.error
-from openai.openai_object import OpenAIObject
+from openai import OpenAI, OpenAIObject
 
 from dsp.modules.cache_utils import CacheMemory, NotebookCacheMemory, cache_turn_on
 from dsp.modules.lm import LM
@@ -40,7 +39,7 @@ class GPT3(LM):
         **kwargs,
     ):
         super().__init__(model)
-        self.provider = "openai"
+        self.provider = OpenAI()
 
         default_model_type = "chat" if ('gpt-3.5' in model or 'turbo' in model or 'gpt-4' in model) and ('instruct' not in model) else "text"
         self.model_type = model_type if model_type else default_model_type
@@ -56,12 +55,13 @@ class GPT3(LM):
                 openai.api_version = kwargs["api_version"]
 
         if api_key:
-            openai.api_key = api_key
+            self.provider = OpenAI(api_key=api_key)
 
         if kwargs.get("api_base"):
             openai.api_base = kwargs["api_base"]
 
-        self.kwargs = {
+        # Backward compatibility with openai v0.28
+        self.compat_mode = hasattr(openai, 'Completion')        self.kwargs = {
             "temperature": 0.0,
             "max_tokens": 150,
             "top_p": 1,
@@ -73,7 +73,11 @@ class GPT3(LM):
         
         if api_provider != "azure":
             self.kwargs["model"] = model
-        self.history: list[dict[str, Any]] = []
+        # Choose client based on compatibility mode
+        if self.compat_mode:
+            client = openai
+        else:
+            client = self.provider        self.history: list[dict[str, Any]] = []
 
     def _openai_client():
         return openai
@@ -88,11 +92,11 @@ class GPT3(LM):
             kwargs = {
                 "stringify_request": json.dumps(kwargs)
             }
-            response = cached_gpt3_turbo_request(**kwargs)
+            response = cached_gpt3_turbo_request(client=client, **kwargs)
             
         else:
             kwargs["prompt"] = prompt
-            response = cached_gpt3_request(**kwargs)
+            response = cached_gpt3_request(client=client, **kwargs)
 
         history = {
             "prompt": prompt,
@@ -183,7 +187,11 @@ class GPT3(LM):
 
 @CacheMemory.cache
 def cached_gpt3_request_v2(**kwargs):
-    return openai.Completion.create(**kwargs)
+    client = kwargs.pop('client', openai)
+    if self.compat_mode:
+        return client.Completion.create(**kwargs)
+    else:
+        return client.completions.create(**kwargs)
 
 
 @functools.lru_cache(maxsize=None if cache_turn_on else 0)
@@ -199,7 +207,11 @@ cached_gpt3_request = cached_gpt3_request_v2_wrapped
 def _cached_gpt3_turbo_request_v2(**kwargs) -> OpenAIObject:
     if "stringify_request" in kwargs:
         kwargs = json.loads(kwargs["stringify_request"])
-    return cast(OpenAIObject, openai.ChatCompletion.create(**kwargs))
+    client = kwargs.pop('client', openai)
+    if self.compat_mode:
+        return cast(OpenAIObject, client.ChatCompletion.create(**kwargs))
+    else:
+        return cast(OpenAIObject, client.chat.completions.create(**kwargs))
 
 
 @functools.lru_cache(maxsize=None if cache_turn_on else 0)
