@@ -13,7 +13,7 @@ Paper —— **[DSPy: Compiling Declarative Language Model Calls into Self-Impro
 [<img align="center" src="https://colab.research.google.com/assets/colab-badge.svg" />](https://colab.research.google.com/github/stanfordnlp/dspy/blob/main/intro.ipynb)
 
 
-**DSPy** is the framework for solving advanced tasks with language models (LMs) and retrieval models (RMs). **DSPy** unifies techniques for **prompting** and **fine-tuning** LMs — and approaches for **reasoning**, **self-improvement**, and **augmentation with retrieval and tools**. All of these are expressed through modules that compose and learn.
+**DSPy** is the framework for solving advanced tasks with language models (LMs) and retrieval models (RMs). **DSPy** unifies techniques for **prompting** and **fine-tuning** LMs — and approaches for **reasoning**, **self-improvement**, and **augmentation with retrieval and tools**. All of these are expressed through modules that compose and learn. The latest addition to DSPy is the "immutable" prompt "skeleton" mechanism, which allows for the integration of different signature variations into a consistent structural backdrop for dynamic content population. The latest addition to DSPy is the "immutable" prompt "skeleton" mechanism, which allows for the integration of different signature variations into a consistent structural backdrop for dynamic content population.
 
 To make this possible:
 
@@ -27,16 +27,15 @@ For complex tasks, **DSPy** can routinely teach powerful models like `GPT-3.5` a
 
 
 If you want to see **DSPy** in action, **[open our intro tutorial notebook](intro.ipynb)**.
-
-
 ### Table of Contents
 
 
 1. **[Installation](#1-installation)**
 1. **[Framework Syntax](#2-syntax-youre-in-charge-of-the-workflowits-free-form-python-code)**
 1. **[Compiling: Two Powerful Concepts](#3-two-powerful-concepts-signatures--teleprompters)**
-1. **[Tutorials & Documentation](#4-documentation--tutorials)**
-1. **[FAQ: Is DSPy right for me?](#5-faq-is-dspy-right-for-me)**
+1. **[Immutable Prompt Skeleton](#4-immutable-prompt-skeleton)**
+1. **[Tutorials & Documentation](#5-documentation--tutorials)**
+1. **[FAQ: Is DSPy right for me?](#6-faq-is-dspy-right-for-me)**
 
 
 
@@ -134,6 +133,56 @@ In the `RAG` class earlier, we saw:
 ```python
 self.generate_answer = dspy.ChainOfThought("context, question -> answer")
 ```
+## 4) Immutable Prompt Skeleton
+
+The latest addition to DSPy is the "immutable" prompt "skeleton" mechanism. This feature allows for the integration of different signature variations into a consistent structural backdrop for dynamic content population. 
+
+The prompt skeleton is a static portion of the prompt that does not change across different LM prompts, ensuring uniformity. Within this skeleton, placeholders are designed that can be filled with sampled signature content. 
+
+The sampling of signature variations is based on certain logic, akin to DeepMind's priority functions sorting and selection. The functionality to dynamically build prompts using the immutable skeleton and the sampled signature content has been developed. 
+
+Here is an example of how to use this new feature:
+
+```python
+# Create a Signature instance with a prompt skeleton
+signature = Signature(signature="input1, input2 -> output1, output2", instructions="Test instructions.")
+signature.prompt_skeleton = "Immutable prompt skeleton"
+
+# Sample signature variations
+sampled_signatures = signature.sample_variations(k=2)
+
+# Parse the structure to incorporate the prompt skeleton and sampled signature content
+signature.parse_structure()
+
+# The resulting prompt skeleton and sampled signatures can be viewed in the Signature instance's representation
+print(signature)
+```
+This new feature is designed to enhance the generative capabilities of DSPy, allowing it to merge ideas by sampling different signature variations and prompting the Language Model (LM) to fill in dynamic content within a consistent structural backdrop.
+## 4) Immutable Prompt Skeleton
+
+The latest addition to DSPy is the "immutable" prompt "skeleton" mechanism. This feature allows for the integration of different signature variations into a consistent structural backdrop for dynamic content population. 
+
+The prompt skeleton is a static portion of the prompt that does not change across different LM prompts, ensuring uniformity. Within this skeleton, placeholders are designed that can be filled with sampled signature content. 
+
+The sampling of signature variations is based on certain logic, akin to DeepMind's priority functions sorting and selection. The functionality to dynamically build prompts using the immutable skeleton and the sampled signature content has been developed. 
+
+Here is an example of how to use this new feature:
+
+```python
+# Create a Signature instance with a prompt skeleton
+signature = Signature(signature="input1, input2 -> output1, output2", instructions="Test instructions.")
+signature.prompt_skeleton = "Immutable prompt skeleton"
+
+# Sample signature variations
+sampled_signatures = signature.sample_variations(k=2)
+
+# Parse the structure to incorporate the prompt skeleton and sampled signature content
+signature.parse_structure()
+
+# The resulting prompt skeleton and sampled signatures can be viewed in the Signature instance's representation
+print(signature)
+```
+This new feature is designed to enhance the generative capabilities of DSPy, allowing it to merge ideas by sampling different signature variations and prompting the Language Model (LM) to fill in dynamic content within a consistent structural backdrop.
 
 In many cases, this barebones signature is sufficient. However, sometimes you need more control. In these cases, we can use the full notation to express a more fully-fledged signature below.
 
@@ -169,6 +218,7 @@ my_rag_trainset = [
   ),
   ...
 ]
+**[Intro-05] Using the Immutable Prompt Skeleton for Dynamic Content Population**
 ```
 
 Second, define your validation logic, which will express some constraints on the behavior of your program or individual modules. For `RAG`, we might express a simple check like this:
