@@ -58,8 +58,9 @@ class SignatureMeta(type):
         return super().__getattr__(attr)    
 
 class Signature(metaclass=SignatureMeta):
-    def __init__(self, signature: str = "", instructions: str = ""):
+    def __init__(self, signature: str = "", instructions: str = "", prompt_skeleton: str = None):
         self.signature = signature
+        self.prompt_skeleton = prompt_skeleton if prompt_skeleton is not None else ""
         self.instructions = instructions
         self.fields = {}
         self.parse_structure()
@@ -140,6 +141,10 @@ class Signature(metaclass=SignatureMeta):
 
     def __eq__(self, __value: object) -> bool:
         return self._template == __value._template
+
+    def fill_prompt(self, field_values: dict) -> str:
+        filled_prompt = self.prompt_skeleton.format(**field_values)
+        return filled_prompt
 
 
 
