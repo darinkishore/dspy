@@ -7,6 +7,7 @@ import subprocess
 
 import dsp
 from datasets.fingerprint import Hasher
+from dsp.retriever.retriever_interface import RetrieverInterface
 from dsp.modules.signature_sampler import SignatureSampler
 
 if os.environ.get('DSP_NOTEBOOK_CACHEDIR'):
@@ -160,9 +161,11 @@ def finetune(training_data, target):
     return ft
 
 # 4. Return updated program.
-def compile(self, program, examples, k, target='ada'):
+def compile(self, program, examples, k, target='ada', database=None):
+    retriever = RetrieverInterface(database)
+    retrieved_signatures = retriever.retrieve("")  # Add appropriate query if needed
     signature_sampler = SignatureSampler()
-    sampled_signatures = signature_sampler.sample(program.signatures, k)
+    sampled_signatures = signature_sampler.sample(retrieved_signatures, k)
     prompt = ''
     for signature in sampled_signatures:
         prompt += signature.instructions.format(*signature.placeholders)
