@@ -25,6 +25,12 @@ Note that this teleprompter takes in the following parameters:
 
 """
 class BasicGenerateInstruction(Signature):
+    placeholders = []
+
+    def __init__(self, placeholders=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.placeholders = placeholders if placeholders is not None else []
+
     """You are an instruction optimizer for large language models. I will give you a ``signature`` of fields (inputs and outputs) in English. Your task is to propose an instruction that will lead a good language model to perform the task well. Don't be afraid to be creative."""
 
     basic_instruction = dspy.InputField(desc="The initial instructions before optimization")
@@ -120,7 +126,7 @@ class SignatureOptimizer(Teleprompter):
                     instruction, prefix = c.proposed_instruction.strip('"').strip(), c.proposed_prefix_for_output_field.strip('"').strip()
 
                     # Set this new module with our instruction / prefix 
-                    p_new.extended_signature.instructions = instruction
+                    p_new.extended_signature.instructions = instruction.format(*p_new.extended_signature.placeholders)
                     p_new.extended_signature.fields[-1] = p_new.extended_signature.fields[-1]._replace(name=prefix)
 
                     # Score the instruction / prefix 
