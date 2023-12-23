@@ -46,7 +46,8 @@ def convert_to_training_point2(y, inputs, outputs, template):
     assert len(inputs) + len(outputs) == len(template.fields)
 
     y_ = dsp.Example(**{f: y[f] for f in inputs}, demos=[])
-    prompt = template(y_, show_guidelines=False)
+    prompt = template.fill_prompt({**y_.kwargs})
+    # Comment: Use fill_prompt method to construct the dynamic prompt content
 
     completion = y[outputs[0]]
     output_fields = template.fields[len(inputs):]
@@ -150,6 +151,11 @@ def finetune(training_data, target):
 
     with open(training_data_path, 'w') as f:
         for line in training_data:
+            # Comment: Use fill_prompt method to construct the dynamic prompt content
+            if 'prompt_skeleton' in line['prompt']:
+                dynamic_parts = line['completion'].split(' ')
+                field_values = {f'dynamic_part_{i}': part for i, part in enumerate(dynamic_parts)}
+                line['prompt'] = line['prompt']['prompt_skeleton'].fill_prompt(field_values)
             f.write(ujson.dumps(line) + '\n')
 
     jobname, ft = openai_finetune(name, target)
