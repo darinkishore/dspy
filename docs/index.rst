@@ -1,7 +1,6 @@
 Welcome to DSPy
 ##########################
 
-
 .. image:: images/DSPy8.png
    :width: 460px
    :align: center
@@ -40,69 +39,41 @@ Getting Started
 
 We recommend checking out our `Getting Started Guide <./getting_started/overview.html>`_ to help you navigate the documentation based on your expertise.
 
-🗺️ Ecosystem
-************
+🗺️ Contributing
+*****************
 
-To download or contribute, find DSPy on:
+# TODO
 
-- Github: https://github.com/stanfordnlp/dspy
-- PyPi:
-
-  - DSPy: https://pypi.org/project/dspy/
-
-- NPM (Typescript/Javascript):
-   - Github: https://github.com/stanfordnlp/dspy-ts
-   - Docs: https://ts.dspy.ai/
-   - DSPy.TS: https://www.npmjs.com/package/dspy
 
 Community
----------
+************
 Need help? Have a feature suggestion? Join the DSPy community:
 
-- Twitter: https://twitter.com/dspy_framework
 - Discord: https://discord.gg/dspy
 
 Associated projects
 -------------------
 
-- 🏡 DSPyHub: https://dspyhub.ai | A large (and growing!) collection of custom data connectors
-- 🧪 DSPyLab: https://github.com/stanfordnlp/dspy-lab | Innovative projects leveraging DSPy capabilities
-
 .. toctree::
    :maxdepth: 2
-   :caption: Table of Contents
+   :caption: Getting Started
    :hidden:
 
-   
-   modules/modules.md
-   retrieval/retrieval_models_client.md
-   teleprompters/teleprompters.md
-   language_models/language_models.md
-   language_models/using_local_models.md
+   getting_started/beginner/intro.ipynb
+   .. getting_started/README.md
 
 .. toctree::
    :maxdepth: 1
-   :caption: API Reference
+   :caption: Guides & Tutorials
    :hidden:
 
-   api_reference/index
+   guides/modules.ipynb
+   guides/language_models.ipynb
+   guides/optimizers.ipynb
+   guides/signatures.ipynb
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Community
-   :hidden:
 
-   community/integrations.md
-   community/frequently_asked_questions.md
-   community/full_stack_projects.md
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Changes
-   :hidden:
-
-   changes/changelog.rst
-   changes/deprecated_terms.md
 
 Contributors & Acknowledgements
 -------------------------------
@@ -143,3 +114,51 @@ You can also read more about the evolution of the framework from Demonstrate-Sea
 * [**Releasing the DSP Compiler (v0.1)**](https://twitter.com/lateinteraction/status/1625231662849073160)  (Twitter Thread, Feb 2023)
 * [**Introducing DSP**](https://twitter.com/lateinteraction/status/1617953413576425472)  (Twitter Thread, Jan 2023)
 * [**Demonstrate-Search-Predict: Composing retrieval and language models for knowledge-intensive NLP**](https://arxiv.org/abs/2212.14024.pdf) (Academic Paper, Dec 2022)
+
+| Beginner |  [**Getting Started**](intro.ipynb) | [<img align="center" src="https://colab.research.google.com/assets/colab-badge.svg" />](https://colab.research.google.com/github/stanfordnlp/dspy/blob/main/intro.ipynb)  |  Introduces the basic building blocks in DSPy. Tackles the task of complex question answering with HotPotQA. |
+| Beginner | [**Compiling for Tricky Tasks**](examples/nli/scone/scone.ipynb) | N/A | Teaches LMs to reason about logical statements and negation. Uses GPT-4 to bootstrap few-shot CoT demonstations for GPT-3.5. Establishes a state-of-the-art result on [ScoNe](https://arxiv.org/abs/2305.19426). Contributed by [Chris Potts](https://twitter.com/ChrisGPotts/status/1740033519446057077). |
+| Beginner | [**Local Models & Custom Training Data**](skycamp2023.ipynb) | [<img align="center" src="https://colab.research.google.com/assets/colab-badge.svg" />](https://colab.research.google.com/github/stanfordnlp/dspy/blob/main/skycamp2023.ipynb) | Illustrates two different things together: how to use local models (Llama-2-13B in particular) and how to use your own data examples for training and development.
+
+
+# TODO: map:
+#### Language Model Clients
+
+- [`dspy.OpenAI`](docs/language_models/language_models_client.md#openai)
+- [`dspy.Cohere`](docs/language_models/language_models_client.md#cohere)
+- [`dspy.TGI`](docs/language_models/language_models_client.md#tgi)
+- [`dspy.VLLM`](docs/language_models/language_models_client.md#vllm)
+
+#### Retrieval Model Clients
+
+- [`dspy.ColBERTv2`](docs/retrieval/retrieval_models_client.md#colbertv2)
+- [`dspy.AzureCognitiveSearch`](docs/retrieval/retrieval_models_client.md#azurecognitivesearch)
+
+
+#### Signatures
+
+- `dspy.Signature`
+- `dspy.InputField`
+- `dspy.OutputField`
+
+#### Modules
+
+- [`dspy.Predict`](docs/modules/modules.md#dspypredict)
+- [`dspy.Retrieve`](docs/modules/modules.md#dspyretrieve)
+- [`dspy.ChainOfThought`](docs/modules/modules.md#dspychainofthought)
+- `dspy.majority` (functional self-consistency)
+- `dspy.ProgramOfThought` [[see open PR]](https://github.com/stanfordnlp/dspy/pull/116)
+- [`dspy.ReAct`](docs/modules/modules.md#dspyreact)
+- [`dspy.MultiChainComparison`](docs/modules/modules.md#dspymultichaincomparison)
+- `dspy.SelfCritique` [coming soon]
+- `dspy.SelfRevision` [coming soon]
+
+
+#### Teleprompters
+
+- [`dspy.teleprompt.LabeledFewShot`](docs/Teleprompters/teleprompters.md#telepromptlabeledfewshot)
+- [`dspy.teleprompt.BootstrapFewShot`](docs/Teleprompters/teleprompters.md#telepromptbootstrapfewshot)
+- [`dspy.teleprompt.BootstrapFewShotWithRandomSearch`](docs/Teleprompters/teleprompters.md#telepromptbootstrapfewshotwithrandomsearch)
+- `dspy.teleprompt.LabeledFinetune` [coming soon]
+- [`dspy.teleprompt.BootstrapFinetune`](docs/Teleprompters/teleprompters.md#telepromptbootstrapfinetune)
+- [`dspy.teleprompt.Ensemble`](docs/Teleprompters/teleprompters.md#telepromptensemble)
+- `dspy.teleprompt.kNN` [coming soon]
