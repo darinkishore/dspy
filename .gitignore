@@ -7,6 +7,10 @@
 /logs/
 /docs/downloads/
 /docs/experiments/
+/docs/doctrees/
+/docs/html/
+/docs/_build/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -42,3 +46,4 @@ finetuning_ckpts/
 .idea
 assertion.log
 *.log
+.aider*
