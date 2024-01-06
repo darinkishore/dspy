@@ -45,16 +45,26 @@ def _build_error_msg(feedback_msgs):
 
 
 class DSPyAssertionError(AssertionError):
-    """Custom exception raised when a DSPy `Assert` fails."""
+    """An exception raised specifically by DSPy when an assertion fails.
+
+    This exception is raised when a condition checked by an `Assert` object is determined to be false and
+    bypassing assertions has not been enabled in the DSPy settings.
+
+    Attributes:
+        id (str): The unique identifier of the failed assertion.
+        msg (str): A message that describes the reason for the assertion failure.
+        state (Any): The state of the system at the time of the assertion failure.
+
+    """
 
     def __init__(self, id: str, msg: str, state: Any = None) -> None:
         """
-        Initialize a new instance of the DSPyAssertionError class.
+        Create a new instance of the DSPyAssertionError exception.
 
         Args:
-            id (str): The ID of the assertion.
-            msg (str): The error message.
-            state (Any): The state of the assertion.
+            id (str): The ID of the failed assertion.
+            msg (str): The error message describing the assertion failure.
+            state (Any, optional): The state of the system when the assertion failed. Defaults to None.
         """
         super().__init__(msg)
         self.id = id
@@ -63,19 +73,30 @@ class DSPyAssertionError(AssertionError):
 
 
 class DSPySuggestionError(AssertionError):
-    """Custom exception raised when a DSPy `Suggest` fails."""
+    """An exception raised specifically by DSPy when a suggestion outcome is rejected.
+
+    This exception is thrown when a condition checked by a `Suggest` object does not meet the desired criteria and
+    the suggestion is not being bypassed in the DSPy settings.
+
+    Attributes:
+        id (str): The unique identifier of the failed suggestion.
+        msg (str): A message that describes the reason for the suggestion rejection.
+        target_module (Any): The module associated with the suggestion.
+        state (Any): The state of the system at the time of the suggestion evaluation.
+
+    """
 
     def __init__(
         self, id: str, msg: str, target_module: Any = None, state: Any = None
     ) -> None:
         """
-        Initialize a new instance of the DSPySuggestionError class.
+        Create a new instance of the DSPySuggestionError exception.
 
         Args:
-            id (str): The ID of the suggestion.
-            msg (str): The error message.
-            target_module (Any): The target module of the suggestion.
-            state (Any): The state of the suggestion.
+            id (str): The ID of the rejected suggestion.
+            msg (str): The error message describing the cause for the suggestion rejection.
+            target_module (Any, optional): The module associated with the suggestion. Defaults to None.
+            state (Any, optional): The state of the system at the suggestion evaluation time. Defaults to None.
         """
         super().__init__(msg)
         self.id = id
@@ -88,7 +109,30 @@ class DSPySuggestionError(AssertionError):
 
 
 class Constraint:
+    """Represents a constraint that can be asserted or suggested within the DSPy framework.
+
+    A Constraint is a condition that is intended to be checked during the execution of DSPy workflows. It can
+    be used to assert conditions (with `Assert`) or make suggestions (with `Suggest`) of how a workflow or
+    module should behave.
+
+    Attributes:
+        id (str): A unique identifier for the constraint.
+        result (bool): The result of evaluating the constraint condition (True or False).
+        msg (str, optional): An optional message providing details about the condition being checked. Defaults to an empty string.
+        target_module (Any, optional): An optional reference to the module associated with the constraint. Defaults to None.
+
+    """
+
     def __init__(self, result: bool, msg: str = "", target_module=None):
+        """
+        Initializes a new Constraint object.
+
+        Args:
+            result (bool): The outcome of the constraint check (True if the condition is met, False otherwise).
+            msg (str, optional): A descriptive message about the constraint condition. Defaults to an empty string.
+            target_module (Any, optional): The module that this constraint is associated with, if applicable. Defaults to None.
+
+        """
         self.id = str(uuid.uuid4())
         self.result = result
         self.msg = msg
@@ -98,21 +142,26 @@ class Constraint:
 
 
 class Assert(Constraint):
-    """DSPy Assertion"""
+    """Implements an assert mechanism within the DSPy framework.
+
+    An `Assert` is a type of `Constraint` used to enforce certain conditions that must be met during the DSPy workflows.
+    If the condition is not met and assertions are not being bypassed, this will raise an `DSPyAssertionError`.
+
+    """
 
     def __call__(self) -> bool:
         """
-        Call the Assert instance.
+        Evaluates the assertion and determines if the condition is met.
 
-        If the result is True, return True. If the result is False and bypass_assert is set in the settings, log an error and return True.
-        If the result is False and bypass_assert is not set in the settings, log an error and raise a DSPyAssertionError.
+        If the result of the constraint is True, it means the assertion condition is met. If the result is False, depends on the DSPy settings,
+        it may either log an error and return True (if assertions are being bypassed) or raise a `DSPyAssertionError` (if assertions are not bypassed).
 
         Raises:
-            ValueError: If the result is not a boolean.
-            DSPyAssertionError: If the result is False and bypass_assert is not set in the settings.
+            ValueError: If the result of the constraint is not a boolean value.
+            DSPyAssertionError: If the result is False and assertions are supposed to be enforced according to the settings.
 
         Returns:
-            bool: The result of the assertion.
+            bool: True if the assertion condition is met, False if it is not met but assertions are being bypassed.
         """
         if isinstance(self.result, bool):
             if self.result:
@@ -130,24 +179,28 @@ class Assert(Constraint):
 
 
 class Suggest(Constraint):
-    """DSPy Suggestion"""
+    """Implements a suggestion mechanism within the DSPy framework.
+
+    A `Suggest` is a type of `Constraint` used to propose preferable conditions which are not strictly mandatory within the DSPy workflows.
+    If the condition is not met, depending on DSPy settings, it may either log the failure and return True (if suggestions are being bypassed), or
+    raise a `DSPySuggestionError` if suggestions are enforced and not followed.
+
+    """
 
     def __call__(self) -> Any:
-        if isinstance(self.result, bool):
-            if self.result:
-                return True
-            elif dspy.settings.bypass_suggest:
-                logger.error(f"SuggestionFailed: {self.msg}")
-                return True
-            else:
-                logger.error(f"SuggestionFailed: {self.msg}")
-                raise DSPySuggestionError(
-                    id=self.id,
-                    msg=self.msg,
-                    target_module=self.target_module,
-                    state=dsp.settings.trace,
-                )
-        else:
+        """
+        Evaluates the suggestion and determines if the preferable condition is met.
+
+        If the result of the constraint is True, it means the suggestion condition is met. If it is False, depends on the DSPy settings,
+        it may either log an error and return True (if suggestions are being bypassed) or raise a `DSPySuggestionError` (if suggestions are intended to be enforced).
+
+        Raises:
+            ValueError: If the result of the constraint is not a boolean value.
+            DSPySuggestionError: If the result is False and suggestions are not meant to be bypassed.
+
+        Returns:
+            Any: True if the suggestion condition is met, False if it is not met but suggestions are being bypassed.
+        """
             raise ValueError("Suggestion function should always return [bool]")
 
 

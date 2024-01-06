@@ -33,14 +33,36 @@ import builtins
 
 class InterpreterError(ValueError):
     """
-    An error raised when the interpreter cannot evaluate a Python
-    expression, due to syntax error or unsupported operations.
+    Raised when the PythonInterpreter encounters a non-executable expression.
+
+    Attributes:
+        ValueError: Inherits from ValueError class.
+
+    Methods:
+        None.
     """
     pass
 
 
 class PythonInterpreter():
-    r"""A customized python interpreter to control the execution of
+    """A Python interpreter with controlled execution environment for LLM-generated codes.
+
+    This interpreter restricts the code execution to functions specified in the action space
+    and whitelisted imports. It also features fuzzy variable matching for uncertain variable names.
+
+    Attributes:
+        action_space (Dict[str, Any]): Mapping of permitted actions to corresponding callable objects.
+        state (Dict[str, Any]): Dictionary to store the current execution state.
+        fuzz_state (Dict[str, Any]): Dictionary to store variables with uncertain names for fuzzy matching.
+        import_white_list (List[str]): List of whitelisted importable modules or objects.
+
+    Methods:
+        - __init__: Initializes the PythonInterpreter with given action space and import whitelist.
+        - execute: Executes given Python code within the controlled environment.
+        - clear_state: Clears the current execution state and fuzz state.
+        - _execute_ast: Executes a single AST node within the current state.
+        - Other private methods handling specific types of AST nodes.
+    """
     LLM-generated codes. The interpreter makes sure the code can only execute
     functions given in action space and import white list. It also supports
     fuzzy variable matching to reveive uncertain input variable name.
@@ -138,12 +160,35 @@ class PythonInterpreter():
 
     def __init__(self, action_space: Dict[str, Any],
                  import_white_list: Optional[List[str]] = None) -> None:
+        """Initializes the PythonInterpreter with an action space and an optional import whitelist.
+
+        Args:
+            action_space (Dict[str, Any]): A dictionary defining the callable objects
+                accessible during code execution.
+            import_white_list (Optional[List[str]], optional): A list of importable
+                modules or objects. Defaults to None, which means no imports are allowed.
+        """
         self.action_space = action_space
         self.state = self.action_space.copy()
         self.fuzz_state: Dict[str, Any] = {}
         self.import_white_list = import_white_list or []
 
     def execute(self, code: str, state: Optional[Dict[str, Any]] = None,
+                fuzz_state: Optional[Dict[str, Any]] = None,
+                keep_state: bool = True) -> Any:
+        """Executes the provided Python code within the safe environment of the interpreter.
+
+        Args:
+            code (str): The Python code to execute.
+            state (Optional[Dict[str, Any]], optional): Variables and their values to be used during
+                execution. Default is None.
+            fuzz_state (Optional[Dict[str, Any]], optional): Variables with uncertain names that are
+                to be accessed through fuzzy matching. Default is None.
+            keep_state (bool, optional): If True, retains the state after execution. Default is True.
+
+        Returns:
+            Any: The result of the last expression executed from the code.
+        """
                 fuzz_state: Optional[Dict[str, Any]] = None,
                 keep_state: bool = True) -> Any:
         r""" Execute the input python codes in a security environment.
@@ -201,7 +246,7 @@ class PythonInterpreter():
         return result
     
     def clear_state(self) -> None:
-        r"""Initialize :obj:`state` and :obj:`fuzz_state`"""
+        """Resets the interpreter's execution state and fuzz state to its initial values."""
         self.state = self.action_space.copy()
         self.fuzz_state = {}
     
@@ -209,6 +254,19 @@ class PythonInterpreter():
     # but is still necessary for older versions.
     @typing.no_type_check
     def _execute_ast(self, expression: ast.AST) -> Any:
+        """Executes a single AST (Abstract Syntax Tree) node.
+
+        This method evaluates a single AST node according to the current execution state and fuzz state.
+
+        Args:
+            expression (ast.AST): The AST node to be executed.
+
+        Returns:
+            Any: The result of evaluating the node.
+
+        Raises:
+            InterpreterError: If the execution of the AST node is not supported or results in an error.
+        """
         if isinstance(expression, ast.Assign):
             # Assignment -> evaluate the assignment which should
             # update the state. We return the variable assigned as it may

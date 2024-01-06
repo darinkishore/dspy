@@ -21,13 +21,34 @@ careful when modifying this module to ensure they maintain the expected behavior
 """
 
 class DspModule:
+    '''A proxy class for the original 'dsp' module providing direct access to settings.
+
+    This class allows users to access settings from `dsp_settings` using the simpler syntax `dsp.<setting_name>`.
+    It also maintains access to all other attributes (functions, classes, submodules) of the 'dsp' module.
+
+    Note that developers should handle modifications to this class with care to preserve its intended access patterns.
+    '''
     
     def __init__(self):
+        '''Initializes the DspModule by importing and storing the original module object.'''
         # Import and store the original module object
         self._original_module = sys.modules[__name__]
     
     def __getattr__(self, name):
-        # First, try getting the attribute from the original module
+        '''Attempts to get an attribute from the original module or `dsp_settings`.
+
+        If the attribute is not part of the original module or `dsp_settings`, an AttributeError is raised.
+
+        Args:
+            name (str): The name of the attribute to retrieve.
+
+        Returns:
+            Any: The value of the attribute found in the original module or `dsp_settings`.
+
+        Raises:
+            AttributeError: If the module and `dsp_settings` have no such attribute.
+        '''
+        
         if hasattr(self._original_module, name):
             return getattr(self._original_module, name)
         
