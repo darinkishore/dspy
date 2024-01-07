@@ -5,6 +5,7 @@ from .field import Field, InputField, OutputField
 import threading
 
 class SignatureMeta(type):
+    """A metaclass for the Signature class in the DSPy framework."""
     _thread_local_storage = threading.local()
 
     class _SignatureNamespace:
@@ -45,6 +46,12 @@ class SignatureMeta(type):
         return cls.signature.fields
     
     def __call__(cls, *args, **kwargs):
+        """Calls a Signature instance or creates a new one based on the provided arguments.
+
+        :param args: Positional arguments for the function call.
+        :param kwargs: Keyword arguments for the function call.
+        :return: A Signature instance or the result from the `_template` call.
+        """
         if len(args) == 1 and isinstance(args[0], str):
             instance = super(SignatureMeta, cls).__call__(*args, **kwargs)
             return instance
@@ -52,13 +59,28 @@ class SignatureMeta(type):
         return cls._template(*args, **kwargs)
 
     def __getattr__(cls, attr):
+        """Gets the attribute from the _template object if not found in the class's dictionary.
+
+        :param attr: The name of the attribute to get.
+        :return: The value of the attribute from the _template object.
+        """
         # Redirect attribute access to the template object when accessed on the class directly
         if attr not in cls.__dict__:
             return getattr(cls._template, attr)
         return super().__getattr__(attr)    
 
 class Signature(metaclass=SignatureMeta):
+    """Class used to declare the input/output behavior of LMs in DSPy.
+
+    A Signature instance encapsulates descriptions for input and output fields
+    of a sub-task, allowing DSPy modules to interact with large LMs efficiently.
+    """
     def __init__(self, signature: str = "", instructions: str = ""):
+        """Initializes the Signature instance with a signature string and instructions.
+
+        :param signature: A string defining the input and output fields.
+        :param instructions: Additional instructions for the signature.
+        """
         self.signature = signature
         self.instructions = instructions
         self.fields = {}
@@ -74,6 +96,10 @@ class Signature(metaclass=SignatureMeta):
         return {k: v for k, v in self.fields.items()}
 
     def parse_structure(self):
+        """Parses the signature string to extract and define input and output fields.
+
+        :return: None
+        """
         inputs_str, outputs_str = self.signature.split("->")
         for name in inputs_str.split(","):
             self.add_field(name.strip(), InputField())
@@ -81,6 +107,11 @@ class Signature(metaclass=SignatureMeta):
             self.add_field(name.strip(), OutputField())
 
     def attach(self, **kwargs):
+        """Attaches fields to the Signature with additional properties like prefix and description.
+
+        :param kwargs: A dictionary with field names as keys and tuples of (prefix, desc) as values.
+        :return: The instance of Signature for chaining method calls.
+        """
         for key, (prefix, desc) in kwargs.items():
             field_type = self.fields.get(key)
             if not field_type:
@@ -93,6 +124,13 @@ class Signature(metaclass=SignatureMeta):
         return self
 
     def add_field(self, field_name: str, field_type, position="append"):
+        """Adds a field to the Signature with the specified field name and type.
+
+        :param field_name: The name of the field to add.
+        :param field_type: The type of field being added, can be InputField or OutputField.
+        :param position: Specifies whether to append or prepend the new field in the fields order.
+        :return: None
+        """
         if field_name in self.fields:
             raise ValueError(f"{field_name} already exists in fields.")
         if isinstance(field_type, (InputField, OutputField)):
