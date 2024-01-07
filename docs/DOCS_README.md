@@ -10,6 +10,10 @@ making changes to it and make contributions. DSPy is made by the thriving commun
 behind it, and you're always welcome to make contributions to the project and the
 documentation.
 
+## Module Documentation
+
+- [Evaluate Module](evaluate.md): Documentation for the `evaluate` module in the `dspy` folder.
+
 ## Build Docs
 
 If you haven't already, clone the DSPy Github repo to a local directory:
