@@ -40,14 +40,17 @@ class Module(BaseModule, metaclass=ProgramMeta):
 
     def __call__(self, *args, **kwargs):
         """
-        Call the Module instance.
+        Invoke the Module instance as a function.
+
+        This makes an instance of the Module callable, allowing it to process the given arguments and keyword arguments
+        through its forward method.
 
         Args:
             *args: Variable length argument list.
             **kwargs: Arbitrary keyword arguments.
 
         Returns:
-            Any: The result of the forward method.
+            Any: The result returned from the forward method after processing the input arguments.
         """
         return self.forward(*args, **kwargs)
 
@@ -92,22 +95,35 @@ class Module(BaseModule, metaclass=ProgramMeta):
 
     def map_named_predictors(self, func):
         """
-        Apply a function to all named predictors of the Module instance.
-    
+        Apply a function to each named predictor within the Module instance.
+
+        The provided function is applied to every predictor, and the results are set back into the module with the
+        corresponding names. The intention is to enable transformations of the internal predictors.
+
         Args:
-            func (function): The function to apply.
-    
+            func (Callable[[Predict], Any]): A function that takes a predictor and returns a transformed version or result.
+            This function is applied to each predictor in the module.
+
         Returns:
-            Module: The Module instance itself.
+            Module: The Module instance itself, allowing for method chaining.
         """
         for name, predictor in self.named_predictors():
             set_attribute_by_name(self, name, func(predictor))
         return self
 
     # def __deepcopy__(self, memo):
-    #     # memo is a dict of id's to copies already made during the current call
-    #     # Check if the object is already copied
-    #     if id(self) in memo:
+        # The method __deepcopy__ is part of the copying protocol. It is used by the deepcopy function
+        # from the 'copy' module to allow customization of the copying process for instances of the class.
+        # If an object defines this method, deepcopy will call it to create a deep copy of the object.
+        # The method should return the new object, which should be a deep copy of the original.
+        # However, in this class, the method is not implemented and only defined as a placeholder.
+        #
+        # Args:
+        #     memo (dict): A dictionary that keeps track of already copied objects, to prevent infinite recursion.
+        #
+        # It is commented out to indicate it is a placeholder and not active functionality.
+
+        pass
     #         return memo[id(self)]
 
     #     print(f"Deep copying {self.__class__.__name__}...")
