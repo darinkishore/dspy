@@ -1,0 +1,17 @@
+[project]
+name = "dspy-ai"
+version = "2.0.8"
+description = "DSPy"
+authors = ["Omar Khattab <okhattab@stanford.edu>"]
+license = "MIT License"
+
+[project.dependencies]
+python = "^3.9"
+pinecone-client = "^2.2.4"
+qdrant-client = "^1.6.2"
+fastembed = "^0.1.0"
+chromadb = "^0.4.14"
+marqo = "*"
+
+[project.dev-dependencies]
+pytest = "^6.2.5"
