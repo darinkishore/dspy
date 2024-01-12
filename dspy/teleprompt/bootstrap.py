@@ -179,6 +179,7 @@ class BootstrapFewShot(Teleprompter):
         return success
 
     def _train(self):
+        import dspy
         rng = random.Random(0)
         raw_demos = self.validation
 
@@ -190,8 +191,7 @@ class BootstrapFewShot(Teleprompter):
 
             raw_demos = rng.sample(raw_demos, sample_size)
             
-            import dspy
-            if dspy.settings.release >= 20230928:
+            if dspy.version.release >= 20230928:
                 predictor.demos = raw_demos + augmented_demos
             else:
                 predictor.demos = augmented_demos + raw_demos
