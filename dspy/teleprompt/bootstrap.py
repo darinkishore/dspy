@@ -16,7 +16,7 @@ from dspy.evaluate import Evaluate
 
 # TODO: Switch here from dsp.Example to dspy.Example. Right now, it's okay because it's internal only (predictors).
 # NOTE: Notice the places where we don't shuffle examples. I do like that this one doesn't shuffle.
-# Other ones that consider options may want to use both unshuffled and then shuffle a few times, when considering candidates.
+# Other methods that consider options may want to use both unshuffled and then shuffle a few times, when considering candidates.
 
 # TODO: the max_rounds via branch_idx to get past the cache, not just temperature.
 # In principle, we can also sample multiple outputs from the final generation step
@@ -117,7 +117,7 @@ class BootstrapFewShot(Teleprompter):
         self.validation = self.valset if self.valset is not None else self.validation
 
         # NOTE: Can't yet use evaluate because we need to trace *per example*
-        # evaluate = Evaluate(program=self.teacher, metric=self.metric, num_threads=12)
+        evaluate = Evaluate(program=self.teacher, metric=self.metric, num_threads=12)
         # score = evaluate(self.metric, display_table=False, display_progress=True)
     
     def _bootstrap_one_example(self, example, round_idx=0):
@@ -137,7 +137,7 @@ class BootstrapFewShot(Teleprompter):
                         predictor.demos = [x for x in predictor.demos if x != example]
 
                     prediction = teacher(*example.inputs())
-                    trace = dsp.settings().trace
+                    trace = dsp.context.trace()
 
                     for name, predictor in teacher.named_predictors():
                         predictor.demos = predictor_cache[name]
@@ -151,10 +151,10 @@ class BootstrapFewShot(Teleprompter):
                 current_error_count = self.error_count
             if current_error_count >= self.max_errors:
                 raise e
-            print(f'Failed to run or to evaluate example {example} with {self.metric} due to {e}.')
+            print(f'Failed to run or evaluate example {example} with {self.metric} due to {e}.')
         
         if success:
-            for step in trace:
+            for step in trace or []:
                 predictor, inputs, outputs = step
 
                 if 'dspy_uuid' in example.keys():
