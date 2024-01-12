@@ -1,4 +1,5 @@
 import dsp
+import logging
 import tqdm
 import random
 import threading
@@ -39,7 +40,7 @@ class BootstrapFewShot(Teleprompter):
         self.max_bootstrapped_demos = max_bootstrapped_demos
         self.max_labeled_demos = max_labeled_demos
         self.max_rounds = max_rounds
-        self.max_errors=10
+        self.max_errors=max_errors
         self.error_count = 0
         self.error_lock = threading.Lock()
 
