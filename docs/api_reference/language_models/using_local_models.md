@@ -22,7 +22,9 @@ Initialize `HFModel` within your program with the desired model to load in. Here
 
 ## Prerequisites
 
-- Docker must be installed on your system. If you don't have Docker installed, you can get it from [here](https://docs.docker.com/get-docker/).
+- Ensure that Docker is installed on your system. If Docker is not installed, you can obtain it from [here](https://docs.docker.com/get-docker/).
+
+Follow the command below to run the Text-Generation-Inference Server using Docker:
 
 ## Setting up the Text-Generation-Inference Server
 
@@ -45,7 +47,7 @@ Initialize `HFModel` within your program with the desired model to load in. Here
    num_shard=2 # set to the number of shards you wish to use.
    volume=$PWD/data # share a volume with the Docker container to avoid downloading weights every run
 
-   docker run --gpus all --shm-size 1g -p 8080:80 -v $volume:/data ghcr.io/huggingface/text-generation-inference:0.9.3 --model-id $model --num-shard $num_shard
+   docker run --gpus all --shm-size 1g -p 8080:80 -v $volume:/data -e HUGGING_FACE_HUB_TOKEN={your_token} ghcr.io/huggingface/text-generation-inference:0.9.3 --model-id $model --num-shard $num_shard
    ```
 
    This command will start the server and make it accessible at `http://localhost:8080`.
