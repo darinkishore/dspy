@@ -3,7 +3,7 @@ import logging
 import tqdm
 import random
 import threading
-from dspy.teleprompt import Retry
+from dspy.predict import Retry
 
 from dspy.primitives.example import Example
 
