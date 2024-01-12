@@ -2,14 +2,14 @@ import dsp
 import tqdm
 import random
 import threading
-from dspy.predict.retry import Retry
+from dspy.predict import Retry
 
-from dspy.primitives import Example
+from dspy.primitives.example import Example
 
-from .teleprompt import Teleprompter
+from dspy.teleprompt import Teleprompter
 from .vanilla import LabeledFewShot
 
-from dspy.evaluate.evaluate import Evaluate
+from dspy.evaluate import Evaluate
 
 # TODO: metrics should return an object with __bool__ basically, but fine if they're more complex.
 # They can also be sortable.
@@ -47,7 +47,7 @@ class BootstrapFewShot(Teleprompter):
         self.trainset = trainset
         self.valset = valset
 
-        self._prepare_student_and_teacher(student, teacher)
+        self._prepare_student_and_teacher(student=student, teacher=teacher)
         self._prepare_predictor_mappings()
         self._bootstrap()
 
@@ -62,7 +62,7 @@ class BootstrapFewShot(Teleprompter):
 
         assert self.student._compiled is False, "Student must be uncompiled."
 
-        if self.max_labeled_demos and self.teacher._compiled is False:
+        if self.max_labeled_demos and not self.teacher._compiled:
             teleprompter = LabeledFewShot(k=self.max_labeled_demos)
             self.teacher = teleprompter.compile(self.teacher.reset_copy(), trainset=self.trainset)
 
@@ -77,7 +77,7 @@ class BootstrapFewShot(Teleprompter):
             assert predictor1.signature == predictor2.signature, f"Student and teacher must have the same signatures. {type(predictor1.signature)} != {type(predictor2.signature)}"
             assert id(predictor1) != id(predictor2), "Student and teacher must be different objects."
 
-            name2predictor[name1] = None # dict(student=predictor1, teacher=predictor2)
+            name2predictor[name1] = predictor1 # dict(student=predictor1, teacher=predictor2)
             predictor2name[id(predictor1)] = name1
 
             # FIXME(shangyint): This is an ugly hack to bind traces of
@@ -97,7 +97,7 @@ class BootstrapFewShot(Teleprompter):
         self.name2traces = {name: [] for name in self.name2predictor}
 
         for round_idx in range(self.max_rounds):
-            for example_idx, example in enumerate(tqdm.tqdm(self.trainset)):
+            for example_idx, example in enumerate(tqdm.tqdm(list(self.trainset))):
                 if len(bootstrapped) >= max_bootsraps:
                     break
 
@@ -114,7 +114,7 @@ class BootstrapFewShot(Teleprompter):
         self.validation = [x for idx, x in enumerate(self.trainset) if idx not in bootstrapped]
         random.Random(0).shuffle(self.validation)
 
-        self.validation = self.valset or self.validation
+        self.validation = self.valset if self.valset is not None else self.validation
 
         # NOTE: Can't yet use evaluate because we need to trace *per example*
         # evaluate = Evaluate(program=self.teacher, metric=self.metric, num_threads=12)
@@ -136,8 +136,8 @@ class BootstrapFewShot(Teleprompter):
                         predictor_cache[name] = predictor.demos
                         predictor.demos = [x for x in predictor.demos if x != example]
 
-                    prediction = teacher(**example.inputs())
-                    trace = dsp.settings.trace
+                    prediction = teacher(*example.inputs())
+                    trace = dsp.settings().trace
 
                     for name, predictor in teacher.named_predictors():
                         predictor.demos = predictor_cache[name]
@@ -157,7 +157,7 @@ class BootstrapFewShot(Teleprompter):
             for step in trace:
                 predictor, inputs, outputs = step
 
-                if 'dspy_uuid' in example:
+                if 'dspy_uuid' in example.keys():
                     demo = Example(augmented=True, dspy_uuid=example.dspy_uuid, **inputs, **outputs)
                 else:
                     # TODO: FIXME: This is a hack. RandomSearch will complain for now in this edge case.
@@ -166,7 +166,7 @@ class BootstrapFewShot(Teleprompter):
                 try:
                     predictor_name = self.predictor2name[id(predictor)]
                 except KeyError as e:
-                    continue # FIXME: !
+                    continue
 
                     # TODO: Look closer into this. It's a bit tricky to reproduce.
                     print(f'Failed to find predictor {predictor} in {self.predictor2name}.')
@@ -182,7 +182,7 @@ class BootstrapFewShot(Teleprompter):
         rng = random.Random(0)
         raw_demos = self.validation
 
-        for name, predictor in self.student.named_predictors():
+        for name, predictor in self.student.named_predictors().items():
             augmented_demos = self.name2traces[name][:self.max_bootstrapped_demos]
             
             sample_size = min(self.max_labeled_demos - len(augmented_demos), len(raw_demos))
