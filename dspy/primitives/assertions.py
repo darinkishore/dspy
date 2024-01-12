@@ -148,7 +148,7 @@ class Suggest(Constraint):
                     state=dsp.settings.trace,
                 )
         else:
-            raise ValueError("Suggestion function should always return [bool]")
+            raise ValueError("Assertion function should always return [bool]")
 
 
 #################### Assertion Handlers ####################
