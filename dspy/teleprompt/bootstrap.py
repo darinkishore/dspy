@@ -188,6 +188,28 @@ class BootstrapFewShot(Teleprompter):
         return success
 
     def _train(self):
+        try:
+            import dspy
+            rng = random.Random(0)
+            raw_demos = self.validation
+
+            for name, predictor in self.student.named_predictors().items():
+                augmented_demos = self.name2traces[name][:self.max_bootstrapped_demos]
+                sample_size = min(self.max_labeled_demos - len(augmented_demos), len(raw_demos))
+                sample_size = max(0, sample_size)
+                raw_demos = rng.sample(raw_demos, sample_size)
+                if len(raw_demos) == 0:
+                    predictor.demos = augmented_demos
+                else:
+                    if dspy.version.release >= 20230928:
+                        predictor.demos = raw_demos + augmented_demos
+                    else:
+                        predictor.demos = augmented_demos + raw_demos
+                return self.student
+        except Exception as e:
+            print(f'Failed to run or evaluate the _train method due to {e}.')
+        except Exception as e:
+            print(f'Failed to run or evaluate the _train method due to {e}.')
         import dspy
         rng = random.Random(0)
         raw_demos = self.validation
