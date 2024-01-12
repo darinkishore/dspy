@@ -1,8 +1,6 @@
-# Using local models within DSPy
+# Local Models in DSPy
 
-DSPy supports various methods including `built-in wrappers`, `server integration`, and `external package integration` for model loading. This documentation provides a concise introduction on how to load in models within DSPy extending these capabilities for your specific needs.
-
-## Local Model Loaders
+DSPy allows developers to integrate a variety of local models using different methods such as built-in wrappers or external package integration. For detailed information and a complete guide on how to load and use local models, please refer to the [Getting Started Guide](../getting_started/main.md).
 
 | Loaders | Jump To |
 | --- | --- |
