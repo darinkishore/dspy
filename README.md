@@ -47,25 +47,15 @@ When we build neural networks, we don't write manual _for-loops_ over lists of _
 Ditto! **DSPy** gives you the right general-purpose modules (e.g., `ChainOfThought`, `Retrieve`, etc.) and takes care of optimizing their prompts _for your program_ and your metric, whatever they aim to do. Whenever you modify your code, your data, or your validation constraints, you can _compile_ your program again and **DSPy** will create new effective prompts that fit your changes.
 
 
-## 1) Installation
+## About DSPy
 
-All you need is:
-
-```
-pip install dspy-ai
-```
-
-Or open our intro notebook in Google Colab: [<img align="center" src="https://colab.research.google.com/assets/colab-badge.svg" />](https://colab.research.google.com/github/stanfordnlp/dspy/blob/main/intro.ipynb)
+**DSPy** is the framework for programming with foundation models. Learn to build complex tasks with language models and retrieval models in a Pythonic syntax. For installation instructions and to get started with DSPy, refer to the [Getting Started Guide](getting_started/main.md).
 
 
 > _Note: If you're looking for Demonstrate-Search-Predict (DSP), which is the previous version of DSPy, you can find it on the [v1](https://github.com/stanfordnlp/dspy/tree/v1) branch of this repo._
 
 
-For the optional Pinecone, Qdrant, [chromadb](https://github.com/chroma-core/chroma), or  [marqo](https://github.com/marqo-ai/marqo) retrieval integration(s), include the extra(s) below:
 
-```
-pip install dspy-ai[pinecone]  # or [qdrant] or [chromadb] or [marqo]
-```
 
 ## 2) Syntax: You're in charge of the workflow—it's free-form Python code!
 
