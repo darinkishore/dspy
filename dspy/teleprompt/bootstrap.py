@@ -97,7 +97,7 @@ class BootstrapFewShot(Teleprompter):
         self.name2traces = {name: [] for name in self.name2predictor}
 
         for round_idx in range(self.max_rounds):
-            for example_idx, example in enumerate(tqdm.tqdm(list(self.trainset))):
+            for example_idx, example in enumerate(tqdm.tqdm_notebook(list(self.trainset))):
                 if len(bootstrapped) >= max_bootsraps:
                     break
 
@@ -225,7 +225,7 @@ class BootstrapFewShot(Teleprompter):
                     continue
 
                     # TODO: Look closer into this. It's a bit tricky to reproduce.
-                    print(f'Failed to find predictor {predictor} in {self.predictor2name}.')
+                    logging.error(f'Failed to find predictor {predictor} in {self.predictor2name}.')
                     print('Are you doing this in a notebook (Jupyter)? This might be caused by redefining values by rerunning cells.')
                     print('Try restarting the notebook, or open an issue.')
                     raise KeyError(f'Failed to find predictor {id(predictor)} {predictor} in {self.predictor2name}.') from e
