@@ -10,7 +10,7 @@ from dspy.primitives.example import Example
 from dspy.teleprompt import Teleprompter, LabeledFewShot, Example, Evaluate, Retry, threading, tqdm, random
 from dspy.teleprompt.labeled import LabeledFewShot
 
-from dspy.evaluate import Evaluate
+from dspy.teleprompt.evaluate import Evaluate
 
 # TODO: metrics should return an object with __bool__ basically, but fine if they're more complex.
 # They can also be sortable.
