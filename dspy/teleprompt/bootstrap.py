@@ -122,6 +122,53 @@ class BootstrapFewShot(Teleprompter):
     
     def _bootstrap_one_example(self, example, round_idx=0):
         name2traces = self.name2traces
+        teacher = self.teacher
+        predictor_cache = {}
+
+        try:
+            with dsp.settings.context(trace=[], **self.teacher_settings):
+                lm = dsp.settings.lm
+                lm = lm.copy(temperature=0.7 + 0.001 * round_idx) if round_idx > 0 else lm
+                new_settings = dict(lm=lm) if round_idx > 0 else {}
+
+                with dsp.settings.context(**new_settings):
+                    for name, predictor in teacher.named_predictors():
+                        predictor_cache[name] = predictor.demos
+                        predictor.demos = [x for x in predictor.demos if x != example]
+
+                    prediction = teacher(*example.inputs())
+                    trace = dsp.context.trace()
+
+                    for name, predictor in teacher.named_predictors():
+                        predictor.demos = predictor_cache[name]
+
+                    success = (self.metric is None) or self.metric(example, prediction, trace)
+        except Exception as e:
+            success = False
+            with self.error_lock:
+                self.error_count += 1
+                current_error_count = self.error_count
+            if current_error_count >= 10:
+                print(f'Too many errors encountered: {current_error_count}.')
+            print(f'Failed to run or evaluate example {example} with {self.metric} due to {e}.')
+        else:
+            for step in trace or []:  # If trace is None, use an empty list
+                predictor, inputs, outputs = step
+
+                if 'dspy_uuid' in example.keys():
+                    demo = Example(augmented=True, dspy_uuid=example.dspy_uuid, **inputs, **outputs)
+                else:
+                    # TODO: FIXME: This is a hack. RandomSearch will complain for now in this edge case.
+                    demo = Example(augmented=True, **inputs, **outputs)
+                try:
+                    predictor_name = self.predictor2name[id(predictor)]
+                except KeyError as e:
+                    continue
+                    print(f'Failed to find predictor {predictor} in {self.predictor2name}.')
+                    raise KeyError(f'Failed to find predictor {id(predictor)} {predictor} in {self.predictor2name}.') from e
+                name2traces[predictor_name].append(demo)
+            return success
+        name2traces = self.name2traces
         teacher = self.teacher #.deepcopy()
         predictor_cache = {}
 
