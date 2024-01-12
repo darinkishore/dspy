@@ -7,7 +7,7 @@ from dspy.predict import Retry
 
 from dspy.primitives.example import Example
 
-from dspy.teleprompt import Teleprompter, LabeledFewShot
+from dspy.teleprompt import Teleprompter, LabeledFewShot, Example, Evaluate, Retry, threading, tqdm, random
 from dspy.teleprompt.labeled import LabeledFewShot
 
 from dspy.evaluate import Evaluate
