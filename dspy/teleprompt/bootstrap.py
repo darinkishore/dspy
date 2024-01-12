@@ -151,6 +151,15 @@ class BootstrapFewShot(Teleprompter):
                 current_error_count = self.error_count
             if current_error_count >= self.max_errors:
                 raise e
+        try:
+            print(f'Failed to run or evaluate example {example} with {self.metric} due to {e}.')
+        except Exception as e:
+            success = False
+            with self.error_lock:
+                self.error_count += 1
+                current_error_count = self.error_count
+            if current_error_count >= self.max_errors:
+                raise e
             print(f'Failed to run or evaluate example {example} with {self.metric} due to {e}.')
         
         if success:
@@ -191,9 +200,12 @@ class BootstrapFewShot(Teleprompter):
 
             raw_demos = rng.sample(raw_demos, sample_size)
             
-            if dspy.version.release >= 20230928:
-                predictor.demos = raw_demos + augmented_demos
+            if len(raw_demos) == 0:
+                predictor.demos = augmented_demos
             else:
-                predictor.demos = augmented_demos + raw_demos
+                if dspy.version.release >= 20230928:
+                    predictor.demos = raw_demos + augmented_demos
+                else:
+                    predictor.demos = augmented_demos + raw_demos
 
         return self.student
