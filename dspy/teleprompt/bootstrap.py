@@ -39,7 +39,7 @@ class BootstrapFewShot(Teleprompter):
         self.max_bootstrapped_demos = max_bootstrapped_demos
         self.max_labeled_demos = max_labeled_demos
         self.max_rounds = max_rounds
-        self.max_errors= max_errors
+        self.max_errors=10
         self.error_count = 0
         self.error_lock = threading.Lock()
 
@@ -148,7 +148,7 @@ class BootstrapFewShot(Teleprompter):
             with self.error_lock:
                 self.error_count += 1
                 current_error_count = self.error_count
-            if current_error_count >= self.max_errors:
+            if current_error_count >= 10:
                 raise e
         try:
             print(f'Failed to run or evaluate example {example} with {self.metric} due to {e}.')
@@ -157,7 +157,7 @@ class BootstrapFewShot(Teleprompter):
             with self.error_lock:
                 self.error_count += 1
                 current_error_count = self.error_count
-            if current_error_count >= self.max_errors:
+            if current_error_count >= 10:
                 raise e
             print(f'Failed to run or evaluate example {example} with {self.metric} due to {e}.')
         
