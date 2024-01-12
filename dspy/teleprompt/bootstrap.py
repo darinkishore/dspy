@@ -7,8 +7,8 @@ from dspy.predict import Retry
 
 from dspy.primitives.example import Example
 
-from dspy.teleprompt import Teleprompter
-from .vanilla import LabeledFewShot
+from dspy.teleprompt import Teleprompter, LabeledFewShot
+from dspy.teleprompt.labeled import LabeledFewShot
 
 from dspy.evaluate import Evaluate
 
