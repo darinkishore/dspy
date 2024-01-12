@@ -12,7 +12,7 @@ master_doc = 'index'
 # Set the project information
 project = 'DSPy'
 author = 'DSPy Team'
-version = 'latest'  # TODO: insert actual current version of DSPy
+version = '3.2.1'
 
 # Add the extensions that Sphinx should use
 extensions = [
