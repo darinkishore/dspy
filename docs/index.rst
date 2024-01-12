@@ -37,7 +37,7 @@ DSPy is designed for NLP/AI researchers and practitioners who require a powerful
 Getting Started
 ****************
 
-We recommend checking out our `Getting Started Guide <./getting_started/overview.html>`_ to help you navigate the documentation based on your expertise.
+Check out the [Getting Started with DSPy](getting_started/main.md) page for detailed instructions on installing and using DSPy.
 
 🗺️ Contributing
 *****************
@@ -56,7 +56,7 @@ Associated projects
 
 .. toctree::
    :maxdepth: 2
-   :caption: Getting Started
+   :caption: [Getting Started with DSPy](getting_started/main.md)
    :hidden:
 
    getting_started/beginner/intro.ipynb
