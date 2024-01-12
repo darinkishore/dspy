@@ -201,7 +201,7 @@ class BootstrapFewShot(Teleprompter):
                     predictor.demos = augmented_demos
                 else:
                     if dspy.version.release >= 20230928:
-                        predictor.demos = raw_demos + augmented_demos
+                        predictor.demos = augmented_demos + raw_demos
                     else:
                         predictor.demos = augmented_demos + raw_demos
                 return self.student
