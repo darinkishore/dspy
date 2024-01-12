@@ -40,7 +40,7 @@ Follow the command below to run the Text-Generation-Inference Server using Docke
    cd text-generation-inference
    ```
 
-3. Execute the Docker command under the "Get Started" section to run the server:
+3. Execute the Docker command under the "Get Started" section to run the server. Ensure that you have the required Hugging Face token before running the command:
 
    ```
    model=meta-llama/Llama-2-7b-hf # set to the specific Hugging Face model ID you wish to use.
