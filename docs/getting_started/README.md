@@ -13,7 +13,7 @@ Paper —— **[DSPy: Compiling Declarative Language Model Calls into Self-Impro
 
 To make this possible:
 
-- **DSPy** provides **composable and declarative modules** for instructing LMs in a familiar Pythonic syntax. It upgrades "prompting techniques" like chain-of-thought and self-reflection from hand-adapted _string manipulation tricks_ into truly modular _generalized operations that learn to adapt to your task_.
+- **DSPy** provides **composable and declarative modules** for instructing LMs in a familiar Pythonic syntax. It upgrades "prompting techniques" like chain-of-thought and self-reflection from hand-adapted _string manipulation tricks_ into truly modular _generalized operations that learn to adapt to your task_, including the new **Prompt Compression** for efficiently dealing with context length limitations and principle-based few-shot learning to focus on the underlying strategies or principles that are key to success.
 
 - **DSPy** introduces an **automatic compiler that teaches LMs** how to conduct the declarative steps in your program. Specifically, the **DSPy compiler** will internally _trace_ your program and then **craft high-quality prompts for large LMs (or train automatic finetunes for small LMs)** to teach them the steps of your task.
 
@@ -88,7 +88,7 @@ A program has two key methods, which you can edit to fit your needs.
 
 **Your `__init__` method** declares the modules you will use. Here, `RAG` will use the built-in `Retrieve` for retrieval and `ChainOfThought` for generating answers. **DSPy** offers general-purpose modules that take the shape of _your own_ sub-tasks — and not pre-built functions for specific applications.
 
-Modules that use the LM, like `ChainOfThought`, require a _signature_. That is a declarative spec that tells the module what it's expected to do. In this example, we use the short-hand signature notation `context, question -> answer` to tell `ChainOfThought` it will be given some `context` and a `question` and must produce an `answer`. We will discuss more advanced **[signatures](#3a-declaring-the-inputoutput-behavior-of-lms-with-dspysignature)** below.
+Modules that use the LM, like `ChainOfThought`, require a _signature_. That is a declarative spec that tells the module what it's expected to do. Similarly, our new **Prompt Compression** module offers a straightforward interface for condensing lengthy inputs, ensuring efficiency in contexts with strict token limitations, while principle-based few-shot learning can be leveraged for capturing essential strategies or principles to guide the model's learning. In this example, we use the short-hand signature notation `context, question -> answer` to tell `ChainOfThought` it will be given some `context` and a `question` and must produce an `answer`. We will discuss more advanced **[signatures](#3a-declaring-the-inputoutput-behavior-of-lms-with-dspysignature)** below.
 
 
 **Your `forward` method** expresses any computation you want to do with your modules. In this case, we use the modules `self.retrieve` and `self.generate_answer` to search for some `context` and then use the `context` and `question` to generate the `answer`!
@@ -181,7 +181,7 @@ def validate_context_and_answer(example, pred, trace=None):
 ```
 
 
-Different teleprompters offer various tradeoffs in terms of how much they optimize cost versus quality, etc. For `RAG`, we might use the simple teleprompter called `BootstrapFewShot`. To do so, we instantiate the teleprompter itself with a validation function `my_rag_validation_logic` and then compile against some training set `my_rag_trainset`.
+Different teleprompters offer various tradeoffs in terms of how much they optimize cost versus quality, etc. Including our advancements such as principle-based few-shot learning, which significantly refines the compilation process by focusing on core principles instead of exhaustive details, enhancing learning efficiency. For `RAG`, we might use the simple teleprompter called `BootstrapFewShot`. To do so, we instantiate the teleprompter itself with a validation function `my_rag_validation_logic` and then compile against some training set `my_rag_trainset`.
 
 ```python
 from dspy.teleprompt import BootstrapFewShot
